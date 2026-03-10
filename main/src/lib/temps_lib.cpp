@@ -7,13 +7,13 @@
 #include "lib/temps_lib.h"
 
 
-void temps_init(struct temps_service *service)
+uint8_t temps_lib_init(struct temps_service *service)
 {
 /* TODO: here setup the addresses of every sensor, etc... */
 }
 
 
-void temps_refresh(struct temps_service *service)
+uint8_t temps_lib_refresh(struct temps_service *service)
 {
 /* TODO: here read the temps, update the timers, etc... */
 }

@@ -130,8 +130,8 @@ struct temps_service {
 };
 
 
-void temps_init(struct temps_service *service);
-void temps_refresh(struct temps_service *service);
+uint8_t temps_lib_init(struct temps_service *service);
+uint8_t temps_lib_refresh(struct temps_service *service);
 
 
 #endif

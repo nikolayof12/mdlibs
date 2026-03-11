@@ -34,18 +34,17 @@ void display_lib_refresh(struct display_service *display)
 	if (!display->lcd)
 		return;
 
-	/* rewrite chars */
+	/* refresh lines */
 	if (millis() - display->_refresh_timer_ >= display->_refresh_time) {
-		/* TODO: modify this to use variable count of _cur_lines on screen */
 		display->_refresh_timer_ = millis();
 
-		display->lcd->setCursor(0, 0);
-		for (int i = 0; i < lcd_lines_count; i++)
-			display->lcd->print(display->_cur_lines[0][i]);
+		/* TODO: need to test */
+		for (uint8_t l = 0; l < display->_lcd_lines_count; i++) {
+			display->lcd->setCursor(0, l);
 
-		display->lcd->setCursor(0, 1);
-		for (int i = 0; i < lcd_lines_count; i++)
-			display->lcd->print(display->_cur_lines[1][i]);
+			for (uint8_t c = 0; c < display->_lcd_line_length; c++)
+				display->lcd->print((char) display->_cur_lines[0][c]);
+		}
 	}
 
 	/* on/off bg light */

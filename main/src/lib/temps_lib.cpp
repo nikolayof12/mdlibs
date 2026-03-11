@@ -14,13 +14,15 @@
  * @obj - ptr to DallasTemperature obj, which can control multiple sensors
  * @res - resolution, will set to sensor->resolution
  * @index - index of sensor in 1-Wire
+ * @devices_count - count of expected devices on Wire
  *
  * return 0 if initialization is successful, else *_lib_ec error code
  */
 uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
 			      DallasTemperature *obj,
 			      enum accuracy res,
-			      uint8_t index)
+			      uint8_t index,
+			      uint8_t devices_count)
 {
 /* TODO: here setup the addresses of every sensor, etc... */
 
@@ -30,7 +32,7 @@ uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
 	if (!obj)
 		return dt_obj_not_found_lib_ec;
 
-	if (obj->getDeviceCount() != 1)
+	if (obj->getDeviceCount() != devices_count)
 		return device_not_found_lib_ec;
 
 	TEMPS_SET_SENSOR_TO_ZERO(*sensor);

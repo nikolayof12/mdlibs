@@ -12,7 +12,7 @@
  *		*obj		ptr to DallasTemperature class that control this sensor
  *		address		address of this sensor
  *		resolution	special (12 bit) or simple (9 bit)
- *		cur_temp	current temp, updating default in background TODO func
+ *		cur_temp	current temp, updating in background temps_lib_refresh() func
  *		prev_temp	previous temp, updating with every chage cur_temp:
  *					so, cur_temp will be as prev_temp, new val -> in cur_temp
  *		tar_temp	just value to comparing
@@ -69,8 +69,10 @@
  *
  *
  *	NOTE:
- *		The begin() func of DallasTemperature obj IS NOT called ANYWHERE here.
+ *		begin() func of DallasTemperature obj IS NOT called ANYWHERE here.
+ *		setWaitForConversion() func of DallasTemperature obj IS NOT called ANYWHERE here.
  *		You need to call it yourself for your objects
+ *
  *		TODO: add general init func to do it
  */
 
@@ -110,7 +112,7 @@
 #define TEMPS_SET_SENSOR_TO_ZERO(sensor)			\
 	do {							\
 		(sensor).obj = NULL;				\
-		(sensor).address = 0;				\
+		/*(sensor).address = 0;		*/		\
 		(sensor).resolution = simple;  /* def simple */	\
 		(sensor).cur_temp = 0;				\
 		(sensor).prev_temp = 0;				\
@@ -160,7 +162,8 @@ struct temps_service {
 uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
 			      DallasTemperature *obj,
 			      enum accuracy res,
-			      uint8_t index);
+			      uint8_t index,
+			      uint8_t devices_count);
 uint8_t temps_lib_refresh(struct temps_service *service);
 
 

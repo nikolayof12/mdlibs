@@ -12,7 +12,7 @@
  *		*obj		ptr to DallasTemperature class that control this sensor
  *		address		address of this sensor
  *		resolution	special (12 bit) or simple (9 bit)
- *		cur_temp	current temp, updating default in background TODO func
+ *		cur_temp	current temp, updating in background temps_lib_refresh() func
  *		prev_temp	previous temp, updating with every chage cur_temp:
  *					so, cur_temp will be as prev_temp, new val -> in cur_temp
  *		tar_temp	just value to comparing
@@ -69,8 +69,10 @@
  *
  *
  *	NOTE:
- *		The begin() func of DallasTemperature obj IS NOT called ANYWHERE here.
+ *		begin() func of DallasTemperature obj IS NOT called ANYWHERE here.
+ *		setWaitForConversion() func of DallasTemperature obj IS NOT called ANYWHERE here.
  *		You need to call it yourself for your objects
+ *
  *		TODO: add general init func to do it
  */
 

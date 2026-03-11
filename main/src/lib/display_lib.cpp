@@ -25,7 +25,7 @@ void display_lib_refresh(struct display_service *display)
  * here:
  *	- rewriting chars on screen every display->_refresh_time ms
  *	- on/off bg light (depending on display->_bg_light)
- *	- blinking (if neccessary) every display->_blink_time
+ *	- blinking (if neccessary) every display->_bg_blink_time
  *
  *	if blinking && light on, then no blinking
  */
@@ -65,16 +65,15 @@ void display_lib_refresh(struct display_service *display)
 
 	/* blink */
 	if (display->_bg_blink &&
-	    (millis() - display->_blink_timer_ >= display->_blink_time)) {
+	    (millis() - display->_blink_timer_ >= display->_bg_blink_time)) {
 		display->_blink_timer_ = millis();
 
-		if (display->_bg_light_state) {
+		if (display->_bg_light_state)
 			display->lcd->noBacklight();
-			display->_bg_light_state = 0;
-		} else {
+		else
 			display->lcd->backlight();
-			display->_bg_light_state = 1;
-		}
+
+		display->_bg_light_state = ~display->_bg_light_state;
 	}
 }
 

@@ -97,7 +97,7 @@ typedef uint8_t row[lcd_line_length];	/* one line on display */
 		(display)._bg_light = 0;	 /* disable */	\
 		(display)._bg_light_state = 0;	 /* disable */	\
 		(display)._bg_blink = 0;	 /* disable */	\
-		(display)._blink_time = 500;	 /* every ms */ \
+		(display)._bg_blink_time = 500;	 /* every ms */ \
 		(display)._refresh_time = 500;	 /* every ms */	\
 	} while (0)
 
@@ -112,7 +112,7 @@ struct display_service {
 	uint8_t _bg_light_state;	/* 0 - off, 1 - on; to read current state */
 	uint8_t _bg_blink;		/* 0 - no blinnk, 1 - blink every _bg_blink_time ms */
 
-	uint16_t _blink_time;		/* ms, to bg blink */
+	uint16_t _bg_blink_time;	/* ms, to bg blink */
 	uint32_t _blink_timer_;		/* internal timer */
 	uint16_t _refresh_time;		/* ms, to update text */
 	uint32_t _refresh_timer_;	/* internal timer */

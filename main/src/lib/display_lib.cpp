@@ -39,10 +39,10 @@ void display_lib_refresh(struct display_service *display)
 		display->_refresh_timer_ = millis();
 
 		/* TODO: need to test */
-		for (uint8_t l = 0; l < display->_lcd_lines_count; i++) {
+		for (int l = 0; l < display->_lcd_lines_count; l++) {
 			display->lcd->setCursor(0, l);
 
-			for (uint8_t c = 0; c < display->_lcd_line_length; c++)
+			for (int c = 0; c < display->_lcd_line_length; c++)
 				display->lcd->print((char) display->_cur_lines[0][c]);
 		}
 	}

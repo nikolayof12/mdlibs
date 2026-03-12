@@ -91,15 +91,6 @@
 	static DallasTemperature name(&(name ## _wire))
 
 /*
- * Register new OneWire, DallasTemperature objects to managment MULTIPLE SENSORS (<127)
- *
- * Where 'name' - name for DallasTemperature object
- */
-#define TEMPS_REGISTER_SIMPLE_SENSORS(name, pin)		\
-	static OneWire name ## _wire((pin));			\
-	static DallasTemperature name(&(name ## _wire));	\
-
-/*
  * Register new array of 'struct temp_sensors'
  *
  * Where 'name' - name of array, 'count' - count of items in array

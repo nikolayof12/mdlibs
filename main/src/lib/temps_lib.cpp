@@ -56,6 +56,12 @@ uint8_t _refresh_sensor(struct temp_sensor *sensor)
 	case simple:
 		time = 100;		/* value rounded; to 9 bit */
 		break;
+	case standard:
+		time = 190;		/* value rounded; to 10 bit */
+		break;
+	case advanced:
+		time = 350;		/* default value; to 11 bit */
+		break;
 	case special:
 		time = 750;		/* defaut value; to 12 bit */
 		break;
@@ -96,15 +102,8 @@ uint8_t temps_lib_refresh(struct temps_service *service)
 	struct temp_sensor *sensor;
 	uint8_t ret = 0;
 
-	for (uint8_t i = 0; i < service->simple_sensors_count; i++) {
-		sensor = &(service->simple_sensors[i]);
-		ret = _refresh_sensor(sensor);
-		if (ret)
-			sensor->errors++;
-	}
-
-	for (uint8_t i = 0; i < service->spec_sensors_count; i++) {
-		sensor = &(service->spec_sensors[i]);
+	for (int i = 0; i < service->sensors_count; i++) {
+		sensor = &(service->sensors[i]);
 		ret = _refresh_sensor(sensor);
 		if (ret)
 			sensor->errors++;

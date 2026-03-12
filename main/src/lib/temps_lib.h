@@ -33,38 +33,59 @@
  *
  *	Usage:
  *
+ *	So, we have 2 sensors on D8 pin, and 3 on D10 pin;
+ *	Sensors from D8 pin need set to 12 bit,
+ *	Sensors from D10 pin - to 9 bit.
  *
- *	#define CNT_SPEC_SENSORS 2
- *	#define CNT_SIMPLE_SENSORS 3
+ *	#define COUNT_OF_SENSORS 5
  *
  *	// here register DallasTemperature objects
- *	TEMPS_REGISTER_SPEC_SENSOR(warn_sensor, 8);	// in 8 pin
- *	TEMPS_REGISTER_SPEC_SENSOR(top_sensor, 9);	// in 9 pin
- *	TEMPS_REGISTER_SIMPLE_SENSORS(def_sensors, 10);	// in 10 pin
+ *	TEMPS_REGISTER_SENSORS_PIN(warn_sensors, 8);
+ *	TEMPS_REGISTER_SENSORS_PIN(def_sensors, 10);
  *
- *	// just arrays, without set OneWire/DallasTemperature
- *	TEMPS_REGISTER_ARR(simple_sns_arr, CNT_SIMPLE_SENSORS);
- *	TEMPS_REGISTER_ARR(special_sns_arr, CNT_SPEC_SENSORS);
+ *	// just array, without set OneWire/DallasTemperature
+ *	TEMPS_REGISTER_ARR(sensors_arr, ALL_COUNT_OF_SENSORS);
  *
  *	void some_init_func(struct temps_service *temps)
  *	{
- *		temps->simple_sensors = simple_sns_arr;
- *		temps->simple_sensors_count = CNT_SIMPLE_SENSORS;
- *		temps->spec_sensors = special_sns_arr;
- *		temps->spec_sensors_count = CNT_SPEC_SENSORS;
+ *		temps->sensors = sensors_arr;
+ *		temps->sensors_count = ALL_COUNT_OF_SENSORS;
  *
  *		// sensor found or not, for example, next do it for all your sensors
  *		if (warn_sensor.getDeviceCount() != 1)
  *			return ERROR
  *		...	// other sensors
  *
- *		// next get/set addresses, DallasTemperature obj:
- *		warn_sensor.getAddress(temps->spec_sensor[0].address, 0);
- *				// where [0] - index of this spec sensor in arr, your value
- *		temps->spec_sensors[0].obj = &warn_sensor;	// [0] - ditto
- *		temps->spec_sensors[0].resolution = special;	// [0] - ditto
+ *		// need call before all temps_lib_init_sensor() sensors
+ *		warn_sensors.begin();
+ *		def_sensors.begin();
  *
- *		TODO: doc for simple sensors setup
+ *		temps_lib_init_sensor(&temps->sensors[0],
+ *				      warn_sensors,
+ *				      special,
+ *				      0, 1);
+ *		temps_lib_init_sensor(&temps->sensors[1],
+ *				      warn_sensors,
+ *				      special,
+ *				      0, 1);
+ *
+ *
+ *		temps_lib_init_sensor(&temps->sensors[2],
+ *				      def_sensors,
+ *				      simple,
+ *				      0, 0);
+ *		temps_lib_init_sensor(&temps->sensors[3],
+ *				      def_sensors,
+ *				      simple,
+ *				      0, 1);
+ *		temps_lib_init_sensor(&temps->sensors[4],
+ *				      def_sensors,
+ *				      simple,
+ *				      0, 2);
+ *
+ *		// manually set the async mode
+ *		warn_sensors.setWaitForConversion(false);
+ *		def_sensors.setWaitForConversion(false);
  *	}
  *
  *
@@ -81,27 +102,22 @@
 #endif
 
 /*
- * Register new OneWire, DallasTemperature object to management ONE SENSOR
+ * Register new OneWire, DallasTemperature objects to management sensors
+ * Call once for each temperature pin
  *
- * Where 'name' - name for DallasTemperature object
+ * @name - name for new DallasTemperature object
+ * @pin - pin on which the sensor/sensors are located
  */
-#define TEMPS_REGISTER_SPEC_SENSOR(name, pin)			\
-	static OneWire name ## _wire((pin));			\
+#define TEMPS_REGISTER_SENSORS_PIN(name, pin)			\
+	static OneWire name ##_wire((pin));			\
 	static DallasTemperature name(&(name ## _wire))
 
 /*
- * Register new OneWire, DallasTemperature objects to managment MULTIPLE SENSORS (<127)
- *
- * Where 'name' - name for DallasTemperature object
- */
-#define TEMPS_REGISTER_SIMPLE_SENSORS(name, pin)		\
-	static OneWire name ## _wire((pin));			\
-	static DallasTemperature name(&(name ## _wire));	\
-
-/*
  * Register new array of 'struct temp_sensors'
+ * Call once for all of your sensors
  *
- * Where 'name' - name of array, 'count' - count of items in array
+ * @name - name for new array
+ * @count - count of items in array
  */
 #define TEMPS_REGISTER_ARR(name, count)				\
 	static struct temp_sensor (name)[(count)]
@@ -128,7 +144,14 @@ typedef uint16_t fl_t;
 
 
 #ifdef TEMPS_USE_DS18B20
-enum accuracy { simple = 9, special = 12 };
+enum accuracy {
+			/* resolution	time */
+	simple = 9,	/* 0.5 C	93.75 ms*/
+	standard = 10,	/* 0.25 C	187.5 ms*/
+	advanced = 11,	/* 0.125 C	350 ms */
+	special = 12	/* 0.0625 C	750 ms */
+};
+
 enum {
 	device_not_found_lib_ec = 60,
 	struct_not_found_lib_ec = 61,
@@ -151,11 +174,8 @@ struct temp_sensor {
 };
 
 struct temps_service {
-	struct temp_sensor *simple_sensors;	/* arr */
-	uint8_t simple_sensors_count;
-
-	struct temp_sensor *spec_sensors;	/* arr */
-	uint8_t spec_sensors_count;
+	struct temp_sensor *sensors;		/* arr */
+	uint8_t sensors_count;
 };
 
 

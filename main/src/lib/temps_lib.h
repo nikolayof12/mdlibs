@@ -92,8 +92,10 @@
 
 /*
  * Register new array of 'struct temp_sensors'
+ * Call once for all of your sensors
  *
- * Where 'name' - name of array, 'count' - count of items in array
+ * @name - name for new array
+ * @count - count of items in array
  */
 #define TEMPS_REGISTER_ARR(name, count)				\
 	static struct temp_sensor (name)[(count)]

@@ -152,11 +152,8 @@ struct temp_sensor {
 };
 
 struct temps_service {
-	struct temp_sensor *simple_sensors;	/* arr */
-	uint8_t simple_sensors_count;
-
-	struct temp_sensor *spec_sensors;	/* arr */
-	uint8_t spec_sensors_count;
+	struct temp_sensor *sensors;		/* arr */
+	uint8_t sensors_count;
 };
 
 

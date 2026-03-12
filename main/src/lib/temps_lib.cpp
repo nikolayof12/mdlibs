@@ -102,15 +102,8 @@ uint8_t temps_lib_refresh(struct temps_service *service)
 	struct temp_sensor *sensor;
 	uint8_t ret = 0;
 
-	for (uint8_t i = 0; i < service->simple_sensors_count; i++) {
-		sensor = &(service->simple_sensors[i]);
-		ret = _refresh_sensor(sensor);
-		if (ret)
-			sensor->errors++;
-	}
-
-	for (uint8_t i = 0; i < service->spec_sensors_count; i++) {
-		sensor = &(service->spec_sensors[i]);
+	for (int i = 0; i < service->sensors_count; i++) {
+		sensor = &(service->sensors[i]);
 		ret = _refresh_sensor(sensor);
 		if (ret)
 			sensor->errors++;

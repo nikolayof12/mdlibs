@@ -33,14 +33,13 @@
  *
  *	Usage:
  *
- *
  *	#define CNT_SPEC_SENSORS 2
  *	#define CNT_SIMPLE_SENSORS 3
  *
  *	// here register DallasTemperature objects
- *	TEMPS_REGISTER_SPEC_SENSOR(warn_sensor, 8);	// in 8 pin
- *	TEMPS_REGISTER_SPEC_SENSOR(top_sensor, 9);	// in 9 pin
- *	TEMPS_REGISTER_SIMPLE_SENSORS(def_sensors, 10);	// in 10 pin
+ *	TEMPS_REGISTER_SENSORS_PIN(warn_sensor, 8);
+ *	TEMPS_REGISTER_SENSORS_PIN(top_sensor, 9);
+ *	TEMPS_REGISTER_SENSORS_PIN(def_sensor, 10);
  *
  *	// just arrays, without set OneWire/DallasTemperature
  *	TEMPS_REGISTER_ARR(simple_sns_arr, CNT_SIMPLE_SENSORS);
@@ -81,12 +80,14 @@
 #endif
 
 /*
- * Register new OneWire, DallasTemperature object to management ONE SENSOR
+ * Register new OneWire, DallasTemperature objects to management sensors
+ * Call once for each temperature pin
  *
- * Where 'name' - name for DallasTemperature object
+ * @name - name for new DallasTemperature object
+ * @pin - pin on which the sensor/sensors are located
  */
-#define TEMPS_REGISTER_SPEC_SENSOR(name, pin)			\
-	static OneWire name ## _wire((pin));			\
+#define TEMPS_REGISTER_SENSORS_PIN(name, pin)			\
+	static OneWire name ##_wire((pin));			\
 	static DallasTemperature name(&(name ## _wire))
 
 /*

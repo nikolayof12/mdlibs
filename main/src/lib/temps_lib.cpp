@@ -56,6 +56,12 @@ uint8_t _refresh_sensor(struct temp_sensor *sensor)
 	case simple:
 		time = 100;		/* value rounded; to 9 bit */
 		break;
+	case standard:
+		time = 190;		/* value rounded; to 10 bit */
+		break;
+	case advanced:
+		time = 350;		/* default value; to 11 bit */
+		break;
 	case special:
 		time = 750;		/* defaut value; to 12 bit */
 		break;

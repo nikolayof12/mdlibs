@@ -26,6 +26,15 @@
 	}
 
 /*
+ * Register new array of 'struct button' objects for all your buttons
+ *
+ * @name - name for new array
+ * @size - count of 'struct button' items in array
+ */
+#define KEYBOARDS_REGISTER_BUTTONS_ARRAY(name, size)			\
+	static struct button (name)[(size)]
+
+/*
  * Register new 'struct encoder' static variable to encoder control
  *
  * @name - name for new 'struct encoder' obj

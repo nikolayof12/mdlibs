@@ -71,6 +71,19 @@
 
 typedef void *(*action_func)(void *arg);
 
+/*
+ * Some action of keyboard (press btn, turn encoder...)
+ *
+ * call:
+ *	struct keyboard_action action;
+ *
+ *	action.func(action.data);
+ */
+struct keyboard_action {
+	action_func func;
+	void *data;
+};
+
 struct encoder {
 	action_func left_action_func;
 	action_func left_pressed_action_func;

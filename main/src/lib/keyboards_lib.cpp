@@ -10,7 +10,53 @@ uint8_t keyboards_lib_init(struct keyboard_service *service)
 
 
 uint8_t _refresh_encoder(struct encoder *enc)
-{}
+{
+	struct keyboard_action *action;
+
+	enc->obj->tick();
+
+	if (enc->obj->right()) {
+		if (!enc->right_turn || !enc->right_turn->func)
+			return 1;
+
+		action = enc->right_turn;
+		action->func(action->data);
+
+		return 0;
+	}
+
+	if (enc->obj->rightH()) {
+		if (!enc->right_pressed_turn || !enc->right_pressed_turn->func)
+			return 1;
+
+		action = enc->right_pressed_turn;
+		action->func(action->data);
+
+		return 0;
+	}
+
+	if (enc->obj->left()) {
+		if (!enc->left_turn || !enc->left_turn->func)
+			return 1;
+
+		action = enc->left_turn;
+		action->func(action->data);
+
+		return 0;
+	}
+
+	if (enc->obj->leftH()) {
+		if (!enc->left_pressed_turn || !enc->left_pressed_turn->func)
+			return 1;
+
+		action = enc->left_pressed_turn;
+		action->func(action->data);
+
+		return 0;
+	}
+
+	return 0;
+}
 
 
 uint8_t _refresh_button(struct button *btn)

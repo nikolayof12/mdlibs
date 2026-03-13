@@ -85,10 +85,10 @@ struct keyboard_action {
 };
 
 struct encoder {
-	action_func left_action_func;
-	action_func left_pressed_action_func;
-	action_func right_action_func;
-	action_func right_pressed_action_func;
+	struct keyboard_action *left_turn;
+	struct keyboard_action *left_pressed_turn;
+	struct keyboard_action *right_turn;
+	struct keyboard_action *right_pressed_turn;
 
 	/* service fields */
 	EncButton *obj;

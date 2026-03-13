@@ -86,6 +86,16 @@ uint8_t _refresh_button(struct button *btn)
 	return 0;
 }
 
-uint8_t keyboards_lib_refresh(struct keyboard_service *service)
+uint8_t keyboards_lib_refresh(struct keyboard_service *keyboard)
 {
+/* TODO: add 'ret' computing */
+	uint8_t ret;
+
+	for (int i = 0; i < keyboard->encoders_count; i++)
+		ret = _refresh_encoder(keyboard->encoders[i]);
+
+	for (int i = 0; i < keyboard->buttons_count; i++)
+		ret = _refresh_button(keyboard->buttons[i]);
+
+	return ret;
 }

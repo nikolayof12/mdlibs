@@ -130,8 +130,8 @@ struct encoder {
 };
 
 struct button {
-	struct keyboard_action *press;
-	struct keyboard_action *long_press;
+	struct keyboard_action *click;
+	struct keyboard_action *long_click;
 
 	/* service fields */
 	Button *obj;

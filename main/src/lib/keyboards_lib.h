@@ -30,8 +30,11 @@
  *	my_keyboard.buttons[0] = accept;
  *	my_keyboard.buttons[1] = cancel;
  *	my_keyboard.buttons[2] = back;
+ *	my_keyboard.buttons_count = 3;
  *	my_keyboard.encoders = my_encoders;
  *	my_keyboard.encoders[0] = enc_menu;
+ *	my_keyboard.encoders_count = 1;
+ *
  *
  *	keyboards_lib_init(&my_keyboard);
  *
@@ -47,6 +50,7 @@
 
 /*
  * Register new 'struct button' static variable to button control
+ * Pin are automatically set to INPUT_PULLUP
  *
  * @name - name for new 'struct button" obj
  * @pin - pin number, where button is connected
@@ -115,7 +119,7 @@ typedef void *(*action_func)(void *arg);
  *	action.func(action.data);
  */
 struct keyboard_action {
-	action_func func;
+	action_func func;		/* pointer */
 	void *data;
 };
 
@@ -139,7 +143,10 @@ struct button {
 
 struct keyboard_service {
 	struct encoder *encoders;	/* array */
+	uint8_t encoders_count;
+
 	struct button *buttons;		/* array */
+	uint8_t buttons_count;
 };
 
 

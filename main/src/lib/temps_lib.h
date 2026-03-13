@@ -20,15 +20,14 @@
  *		errors		if some errors in the read/cmp/other proccess, it's will be > 0
  *		_read_timer	internal timer to between request temps
  *
+ *	General structure:
  *	struct temps_service:
- *		simple_sensors		array of simple sensors
- *		simple_sensors_count	length of simple_sensors array
- *		spec_sensors		array of special sensors
- *		spec_sensors_count	length of spec_sensors array
+ *		sensors		array of sensors
+ *		sensors_count	length of sensors array
  *		
  *
  *	You must define:
- *		#define TEMPS_USE_DS18B20
+ *		#define TEMPS_USE_DS18B20	// to use DS18B20 sensor
  *
  *
  *	Usage:
@@ -40,8 +39,8 @@
  *	#define COUNT_OF_SENSORS 5
  *
  *	// here register DallasTemperature objects
- *	TEMPS_REGISTER_SENSORS_PIN(warn_sensors, 8);
- *	TEMPS_REGISTER_SENSORS_PIN(def_sensors, 10);
+ *	TEMPS_REGISTER_SENSORS_PIN(warn_sensors, 8);	// here 2 sensors
+ *	TEMPS_REGISTER_SENSORS_PIN(def_sensors, 10);	// here 3
  *
  *	// just array, without set OneWire/DallasTemperature
  *	TEMPS_REGISTER_ARR(sensors_arr, ALL_COUNT_OF_SENSORS);
@@ -52,7 +51,7 @@
  *		temps->sensors_count = ALL_COUNT_OF_SENSORS;
  *
  *		// sensor found or not, for example, next do it for all your sensors
- *		if (warn_sensor.getDeviceCount() != 1)
+ *		if (warn_sensor.getDeviceCount() != 2)
  *			return ERROR
  *		...	// other sensors
  *
@@ -61,25 +60,25 @@
  *		def_sensors.begin();
  *
  *		temps_lib_init_sensor(&temps->sensors[0],
- *				      warn_sensors,
- *				      special,
+ *				      &warn_sensors,
+ *				      special,			// set resolution here
  *				      0, 1);
  *		temps_lib_init_sensor(&temps->sensors[1],
- *				      warn_sensors,
+ *				      &warn_sensors,
  *				      special,
  *				      0, 1);
  *
  *
  *		temps_lib_init_sensor(&temps->sensors[2],
- *				      def_sensors,
+ *				      &def_sensors,
  *				      simple,
  *				      0, 0);
  *		temps_lib_init_sensor(&temps->sensors[3],
- *				      def_sensors,
+ *				      &def_sensors,
  *				      simple,
  *				      0, 1);
  *		temps_lib_init_sensor(&temps->sensors[4],
- *				      def_sensors,
+ *				      &def_sensors,
  *				      simple,
  *				      0, 2);
  *
@@ -88,6 +87,8 @@
  *		def_sensors.setWaitForConversion(false);
  *	}
  *
+ *	Next you can computing cur_temp, tar_temp, prev_temp, changes_timer in bg function,
+ *	in interrupts, in callback... as you want, here without this
  *
  *	NOTE:
  *		begin() func of DallasTemperature obj IS NOT called ANYWHERE here.

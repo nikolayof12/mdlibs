@@ -57,6 +57,17 @@
 #define KEYBOARDS_REGISTER_ENCODERS_ARRAY(name, size)			\
 	static struct encoder (name)[(size)]
 
+/*
+ * Register new 'struct keyboard_service' for all your keyboard items
+ *
+ * @name - name for new 'struct keyboard_service' object
+ */
+#define KEYBOARDS_REGISTER_SERVICE_STRUCT(name)				\
+	static struct keyboard_service (name) = {			\
+		.encoders = NULL;					\
+		.buttons = NULL;					\
+	}
+
 
 typedef void *(*action_func)(void *arg);
 

@@ -39,8 +39,24 @@
 		.obj = &(_enc_ ## name)					\
 	}
 
-struct keyboard_service {
-	uint8_t *buttons;
+typedef void *(*action_func)(void *arg);
+
+struct encoder {
+	action_func left_action_func;
+	action_func left_pressed_action_func;
+	action_func right_action_func;
+	action_func right_pressed_action_func;
+
+	/* service fields */
+	EncButton *obj;
+};
+
+struct button {
+	action_func press_action;
+	action_func long_press_action;
+
+	/* service fields */
+	Button *obj;
 };
 
 #if 0

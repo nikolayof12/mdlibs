@@ -7,6 +7,41 @@
 
 /*
  * Overview
+ *
+ *
+ * Usage:
+ * For example, we have 1 encoder (D3, D4, D5 pins) and 3 buttons (D7, D8, D9 pins)
+ *
+ *
+ * KEYBOARDS_REGISTER_ENCODER(enc_menu, 3, 4, 5);
+ * KEYBOARDS_REGISTER_ENCODERS_ARRAY(my_encoders, 1);
+ *
+ * KEYBOARDS_REGISTER_BUTTON(accept, 7);
+ * KEYBOARDS_REGISTER_BUTTON(cancel, 8);
+ * KEYBOARDS_REGISTER_BUTTON(back, 9);
+ * KEYBOARDS_REGISTER_BUTTONS_ARRAY(my_buttons, 3);
+ *
+ * KEYBOARDS_REGISTER_SERVICE_STRUCT(my_keyboard);
+ *
+ * uint8_t some_init_func(void)
+ * {
+ *	// collect all keyboard elements into one main structure:
+ *	my_keyboard.buttons = my_buttons;
+ *	my_keyboard.buttons[0] = accept;
+ *	my_keyboard.buttons[1] = cancel;
+ *	my_keyboard.buttons[2] = back;
+ *	my_keyboard.encoders = my_encoders;
+ *	my_keyboard.encoders[0] = enc_menu;
+ *
+ *	keyboards_lib_init(&my_keyboard);
+ *
+ *	// next you can create as many 'keyboard_action' structures as you need and
+ *	// dynamicalli change them in the struct button/encoder
+ *	return 0;
+ * }
+ *
+ * Somewhere in loop() function call:
+ *	keyboards_lib_refresh(&my_keyboard);
  */
 
 
@@ -108,7 +143,7 @@ struct keyboard_service {
 };
 
 
-void keyboards_lib_init(struct keyboard_service *service);
+uint8_t keyboards_lib_init(struct keyboard_service *service);
 
 /* return 1 if one of bts clicked, else 0 */
 uint8_t keyboards_lib_refresh(struct keyboard_service *service);

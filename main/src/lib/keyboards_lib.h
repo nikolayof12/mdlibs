@@ -9,6 +9,22 @@
  * Overview
  */
 
+
+/*
+ * Register new 'struct button' static variable to button control
+ *
+ * @name - name for new 'struct button" obj
+ * @pin - pin number, where button is connected
+ *
+ *
+ * TODO: you don't need to call 'pinMode(pin, INPUT_PULLUP)' in your setup() func????
+ */
+#define KEYBOARDS_REGISTER_BUTTON(name, pin)				\
+	static Button (_btn_ ## name)((pin));				\
+	static struct button (name) = {					\
+		.obj = &(_btn_ ## name)					\
+	}
+
 /*
  * Register new 'struct encoder' static variable to encoder control
  *

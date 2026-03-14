@@ -69,14 +69,7 @@ void display_lib_refresh(struct display_service *display)
 	/* refresh lines */
 	if (millis() - display->_refresh_timer_ >= display->_refresh_time) {
 		display->_refresh_timer_ = millis();
-
-		/* TODO: need to test */
-		for (int l = 0; l < display->_lcd_lines_count; l++) {
-			display->lcd->setCursor(0, l);
-
-			for (int c = 0; c < display->_lcd_line_length; c++)
-				display->lcd->print((char) display->_cur_lines[0][c]);
-		}
+		display_lib_push_current(display);
 	}
 
 	/* on/off bg light */

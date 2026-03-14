@@ -135,9 +135,10 @@
 		(sensor).prev_temp = 0;				\
 		(sensor).tar_temp = 0;				\
 		(sensor).changes_timer = 0;			\
+		(sensor).data = 0;				\
 		(sensor).errors = 0;				\
 		(sensor)._read_timer = 0;			\
-	} while(0)
+	} while (0)
 
 
 /* alias to float, 255 mean 25.5, 777 mean 77.7, 1115 mean 111.5, etc, one sign afer dot */
@@ -170,6 +171,8 @@ struct temp_sensor {
 	fl_t prev_temp;
 	fl_t tar_temp;
 	uint32_t changes_timer;		/* millis(), when value was entered into 'prev_temp' */
+	uint32_t data;			/* user data about this sensor */
+	uint8_t str[5];			/* buff to str representation of cur_temp */
 	uint8_t errors;
 	uint32_t _read_timer;
 };

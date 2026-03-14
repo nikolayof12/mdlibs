@@ -130,6 +130,7 @@ struct display_service {
 };
 
 void display_lib_init(struct display_service *display);
+void display_lib_push_current(struct display_service *display);
 void display_lib_refresh(struct display_service *display);
 void display_lib_set_next_screen(struct display_service *display);
 

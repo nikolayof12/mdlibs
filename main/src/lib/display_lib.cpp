@@ -18,6 +18,38 @@ void display_lib_init(struct display_service *display)
 }
 
 
+/*
+ * Write current lines buffers to screen
+ */
+void display_lib_push_current(struct display_service *display)
+{
+	/* TODO: need to test */
+	for (int l = 0; l < display->_lcd_lines_count; l++) {
+		display->lcd->setCursor(0, l);
+
+		for (int c = 0; c < display->_lcd_line_length; c++)
+			display->lcd->print((char) display->_cur_lines[l][c]);
+	}
+
+	/* on/off bg light */
+	if (display->_bg_light) { /* target - on */
+		if (!display->_bg_light_state) {
+			display->lcd->backlight();
+			display->_bg_light_state = 1;
+		}
+
+		return; /* exit to dont't try do blinking */
+	} else if (!display->_bg_light) { /* target - off */
+		if (display->_bg_light_state && !display->_bg_blink) {
+			display->lcd-> noBacklight();
+			display->_bg_light_state = 0;
+		}
+
+		/* here without 'return', need to try blinking */
+	}
+}
+
+
 void display_lib_refresh(struct display_service *display)
 {
 /* now supported only to LCD1602
@@ -37,14 +69,7 @@ void display_lib_refresh(struct display_service *display)
 	/* refresh lines */
 	if (millis() - display->_refresh_timer_ >= display->_refresh_time) {
 		display->_refresh_timer_ = millis();
-
-		/* TODO: need to test */
-		for (int l = 0; l < display->_lcd_lines_count; l++) {
-			display->lcd->setCursor(0, l);
-
-			for (int c = 0; c < display->_lcd_line_length; c++)
-				display->lcd->print((char) display->_cur_lines[0][c]);
-		}
+		display_lib_push_current(display);
 	}
 
 	/* on/off bg light */

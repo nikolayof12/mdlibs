@@ -55,6 +55,17 @@ uint8_t _refresh_encoder(struct encoder *enc)
 		return 0;
 	}
 
+	if (enc->obj->click()) {
+		if (!enc->click || !enc->click->func)
+			return 1;
+
+		action = enc->click;
+		action->func(action->data);
+
+		return 0;
+	}
+
+
 	return 0;
 }
 

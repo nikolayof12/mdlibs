@@ -45,6 +45,23 @@
  *
  * Somewhere in loop() function call:
  *	keyboards_lib_refresh(&my_keyboard);
+ *
+ *
+ * You can set hardware interrupts in some pins, for example to encoder:
+ *
+ * void some_isr(void)
+ * {
+ *	enc_menu.obj->tickISR();
+ * }
+ *
+ * void setup(void)
+ * {
+ *	attachInterrupt(digitalPinToInterrupt(YOUR_ENC_PIN_LEFT), some_isr, CHANGE);
+ *	attachInterrupt(digitalPinToInterrupt(YOUR_ENC_PIN_RIGHT), some_isr, CHANGE);
+ * }
+ * NOTE:
+ *	Of cource, you need keyboard_action's for every encoder turns -- compute it in other funcs
+ *	Before using, check wich pins have hardware interrupts available to you.
  */
 
 
@@ -90,6 +107,7 @@
 		.left_pressed_turn = NULL,				\
 		.right_turn = NULL,					\
 		.right_pressed_turn = NULL,				\
+		.click = NULL,						\
 		.obj = &(_enc_ ## name)					\
 	}
 
@@ -136,6 +154,7 @@ struct encoder {
 	struct keyboard_action *left_pressed_turn;
 	struct keyboard_action *right_turn;
 	struct keyboard_action *right_pressed_turn;
+	struct keyboard_action *click;
 
 	/* service fields */
 	EncButton *obj;

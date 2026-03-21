@@ -138,7 +138,19 @@ uint8_t temps_lib_refresh(struct temps_service *service)
  * temps_lib_convert(333, res, 1);
  * -> res == " 33.3"
  * temps_lib_convert(333, res, 0);
- * -> res == "  333"
+ * -> res == "333aa"
+ *
+ *  max:
+ *	temps_lib_convert(999, res, 1)
+ *	-> "999.9"
+ *	temps_lib_convert(999, res, 0)
+ *	-> "999  "
+ *
+ *  err:
+ *	temps_lib_convert(10000, res, 1)
+ *	-> "aeraa"
+ *	temps_lib_convert(10000, res, 0)
+ *	-> "aeraa"
  */
 uint8_t *temps_lib_convert(fl_t num, uint8_t buff[5], uint8_t is_float)
 {

@@ -181,7 +181,7 @@ struct temp_sensor {
 	uint32_t data;			/* user data about this sensor */
 	uint8_t cur_temp_str[5];	/* buff to str representation of cur_temp */
 	uint8_t errors;
-	uint8_t is_enable;		/* 0 - disable, 1 - enable */
+	bool is_enable;
 	uint32_t _read_timer;
 };
 

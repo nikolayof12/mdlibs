@@ -86,6 +86,12 @@
  *	Before using, check wich pins have hardware interrupts available to you.
  */
 
+/*
+ * TODO list:
+ *	KEYBOARDS_REGISTER_*_ARRAY() macro:
+ *		- maybe this array should consist of pointers, not structures?
+ *		  this will reduce the size of the firmware file
+ */
 
 /*
  * Register new 'struct button' static variable to button control

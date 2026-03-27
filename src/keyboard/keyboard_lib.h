@@ -6,11 +6,33 @@
 #include <EncButton.h>
 
 /*
- * Overview
+ *	Overview
+ *
+ *	This library provides centralized control of the following elements:
+ *		- buttons
+ *		- encoders
+ *
+ *	Each keyboard element is a data structure:
+ *		- struct button
+ *		- struct encoder
+ *
+ *	The entire keyboard is represented by a 'struct keyboard_service', which stores
+ *	arrays of your encoders and buttons and other elements (arrays of structures) and
+ *	variables with the value of their number.
+ *
+ *	The library offers you a list of macros that create global static keyboard element
+ *	objects and arrays of structures for them:
+ *		- KEYBOARDS_REGISTER_BUTTON();
+ *		- KEYBOARDS_REGISTER_BUTTONS_ARRAY();
+ *
+ *		- KEYBOARDS_REGISTER_ENCODER();
+ *		- KEYBOARDS_REGISTER_ENCODERS_ARRAY();
+ *
+ *		- KEYBOARDS_REGISTER_SERVICE_STRUCT();
  *
  *
- * Usage:
- * For example, we have 1 encoder (D3, D4, D5 pins) and 3 buttons (D7, D8, D9 pins)
+ *	Usage:
+ *	For example, we have 1 encoder (D3, D4, D5 pins) and 3 buttons (D7, D8, D9 pins)
  *
  *
  * KEYBOARDS_REGISTER_ENCODER(enc_menu, 3, 4, 5);
@@ -72,8 +94,8 @@
  * @name - name for new 'struct button" obj
  * @pin - pin number, where button is connected
  *
- *
- * TODO: you don't need to call 'pinMode(pin, INPUT_PULLUP)' in your setup() func????
+ * NOTE:
+ *	Here, 'button' is simply a connection from GPIO @pin to GND
  */
 #define KEYBOARDS_REGISTER_BUTTON(name, pin)				\
 	static Button (_btn_ ## name)((pin));				\

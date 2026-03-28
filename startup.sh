@@ -56,5 +56,27 @@ Examples:
 }
 
 
+# pass the script execution arguments here
+function args_processing()
+{
+	while [ -n "$1" ]
+	do
+		case "$1" in
+		--help)
+			;;
+		--device-file)
+			;;
+		*)
+			echo "Option '$1' not found"
+			exit 1
+			;;
+		esac
+
+		shift
+	done
+}
+
+
+args_processing $@
 compile_firmware
 upload_firmware

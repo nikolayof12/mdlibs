@@ -7,9 +7,6 @@
 #      sketch upload port to as a command line argument
 
 
-#If your sketch upload port is named differently, change this variable
-load_device=/dev/ttyUSB0
-
 
 
 function compile_firmware()
@@ -21,12 +18,27 @@ function compile_firmware()
 }
 
 
-compile_firmware
+# $1 - device file to upload
+function upload_firmware()
+{
+	if [ -n "$1" ]
+	then
+		local load_device=$1
+	else
+		local load_device=/dev/ttyUSB0
+	fi
 
-if [ -e load_device ]
-then
-	arduino-cli upload -p $load_device --fqbn arduino:avr:nano ./main/main.ino
-else
-	echo
-	echo "I can't find a port '$load_device' to upload the sketch to."
-fi
+	if [ -e load_device ]
+	then
+		arduino-cli upload -p $load_device --fqbn arduino:avr:nano ./main/main.ino
+	else
+		echo
+		echo "I can't find a port '$load_device' to upload the sketch to."
+	fi
+}
+
+
+
+
+compile_firmware
+upload_firmware

@@ -38,6 +38,22 @@ function upload_firmware()
 }
 
 
+function print_help_message()
+{
+	echo "\
+This script is designed to automate the process of compiling
+and uploading firmware into a microcontroller.
+
+Available command line arguments:
+
+  --help			display this help and exit
+  --device-file PATH		path to the file representing your microcontroller
+
+Examples:
+  ./startup.sh					just run if your load device is /dev/ttyUSB0
+  ./startup.sh --device-file /dev/ttyUSB3	if your load device is /dev/ttyUSB3 \
+"
+}
 
 
 compile_firmware

@@ -12,9 +12,16 @@ load_device=/dev/ttyUSB0
 
 
 
+function compile_firmware()
+{
+	arduino-cli compile --fqbn arduino:avr:nano \
+		--build-property \
+			"compiler.cpp.extra_flags=-I./main/include/ -I./main/src/ -I./main/" \
+		./main/main.ino
+}
 
-arduino-cli compile --fqbn arduino:avr:nano ./main/main.ino \
-	--build-property "compiler.cpp.extra_flags=-I./main/include/ -I./main/src/ -I./main/"
+
+compile_firmware
 
 if [ -e load_device ]
 then

@@ -29,7 +29,7 @@ function upload_firmware()
 		local load_device=/dev/ttyUSB0
 	fi
 
-	if [ -e load_device ]
+	if [ -e $load_device ]
 	then
 		arduino-cli upload -p $load_device --fqbn arduino:avr:nano ./main/main.ino
 	else

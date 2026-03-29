@@ -64,6 +64,8 @@ function args_processing()
 	do
 		case "$1" in
 		--help)
+			print_help_message
+			exit 0
 			;;
 		--device-file)
 			shift

@@ -9,13 +9,29 @@
 
 upload_args=""		# arguments for the upload_firmware() func
 
+default_firmware_file=./main/main.ino
 
+
+# $1 - main firmware file
 function compile_firmware()
 {
+	if [ -n "$1" ]
+	then
+		local firmware_main_file=$1
+	else
+		local firmware_main_file=$default_firmware_file
+	fi
+	if [ ! -f $firmware_main_file ]
+	then
+		echo "I can't find the '$firmware_main_file' file to compile"
+		exit 10
+	fi
+
+
 	arduino-cli compile --fqbn arduino:avr:nano \
 		--build-property \
 			"compiler.cpp.extra_flags=-I./main/include/ -I./main/src/ -I./main/" \
-		./main/main.ino
+		$firmware_main_file
 }
 
 

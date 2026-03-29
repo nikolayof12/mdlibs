@@ -36,6 +36,7 @@ function compile_firmware()
 
 
 # $1 - device file to upload
+# $2 - main firmware file
 function upload_firmware()
 {
 	if [ -n "$1" ]
@@ -44,14 +45,27 @@ function upload_firmware()
 	else
 		local load_device=/dev/ttyUSB0
 	fi
-
-	if [ -e $load_device ]
+	if [ -n "$2" ]
 	then
-		arduino-cli upload -p $load_device --fqbn arduino:avr:nano ./main/main.ino
+		local firmware_main_file=$2
 	else
-		echo
-		echo "I can't find a port '$load_device' to upload the sketch to."
+		local firmware_main_file=$default_firmware_file
 	fi
+
+
+	if [ ! -e $load_device ]
+	then
+		echo "upload: I can't find a port '$load_device' to upload the sketch to."
+		exit 20
+	fi
+	if [ ! -e $firmware_main_file ]
+	then
+		echo "upload: I can't find a '$firmware_main_file' firmware file"
+		exit 21
+	fi
+
+
+	arduino-cli upload -p $load_device --fqbn arduino:avr:nano $firmware_main_file
 }
 
 

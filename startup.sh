@@ -2,6 +2,11 @@
 
 #	This script is designed to simplify the dumping of an Arduino project
 #	from the Linux command line.
+#
+#	Exit codes:
+#	1 - 9		error when specifying coommand line arguments
+#	10 - 19		compilation errors
+#	20 - 29		uploading errors
 
 #TODO: make this script more interactive, such as the ability to specify the
 #      sketch upload port to as a command line argument

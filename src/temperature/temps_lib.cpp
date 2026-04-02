@@ -51,7 +51,6 @@ uint8_t _refresh_sensor(struct temp_sensor *sensor)
 /* TODO: handle possible read errors */
 	uint16_t time = 0;
 	uint8_t ret = 0;
-	uint8_t is_float;
 
 	/* exit if sensor disable */
 	if (!sensor->is_enable)
@@ -60,23 +59,18 @@ uint8_t _refresh_sensor(struct temp_sensor *sensor)
 	switch (sensor->resolution) {		/* setup ds18b20 sensor measurement time */
 	case simple:
 		time = 100;		/* value rounded; to 9 bit */
-		is_float = 0;
 		break;
 	case standard:
 		time = 190;		/* value rounded; to 10 bit */
-		is_float = 0;
 		break;
 	case advanced:
 		time = 350;		/* default value; to 11 bit */
-		is_float = 0;
 		break;
 	case special:
 		time = 750;		/* defaut value; to 12 bit */
-		is_float = 1;
 		break;
 	default:
 		time = 750;
-		is_float = 1;
 		break;
 	}
 
@@ -93,9 +87,6 @@ uint8_t _refresh_sensor(struct temp_sensor *sensor)
 
 		sensor->cur_temp = new_temp;
 		sensor->_read_timer = 0;	/* neccessary */
-
-		/* save str value of cur_temp to buff */
-		temps_lib_convert(sensor->cur_temp, sensor->cur_temp_str, is_float);
 	}
 
 	if (!sensor->_read_timer) {

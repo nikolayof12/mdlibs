@@ -8,6 +8,7 @@
 
 
 upload_args=""		# arguments for the upload_firmware() func
+compile_args=""		# arguments for the compile_firmware() func
 
 default_firmware_file=./main/main.ino
 
@@ -79,6 +80,7 @@ Available command line arguments:
 
   --help			display this help and exit
   --device-file PATH		path to the file representing your microcontroller
+  --firmware-file PATH		path to the main firmware file to pass it in compile func
 
 Examples:
   ./startup.sh					just run if your load device is /dev/ttyUSB0
@@ -107,6 +109,16 @@ function args_processing()
 				exit 1
 			fi
 			;;
+		--firmware-file)
+			if [ -n "$2" ]
+			then
+				compile_args+="$2"
+			else
+				echo "You need to specify the main firmware file"
+				exit 2
+			fi
+			shift
+			;;
 		*)
 			echo "Option '$1' not found"
 			exit 1
@@ -119,5 +131,5 @@ function args_processing()
 
 
 args_processing $@
-compile_firmware
+compile_firmware $compile_args
 upload_firmware $upload_args

@@ -155,6 +155,11 @@ typedef uint16_t fl_t;
 #define DS18B20_MAX_TEMP 125
 #define DS18B20_MIN_TEMP -55
 
+#define DS18B20_9_BIT_TIME 95
+#define DS18B20_10_BIT_TIME 190
+#define DS18B20_11_BIT_TIME 350
+#define DS18B20_12_BIT_TIME 750
+
 enum accuracy {
 			/* resolution	time */
 	simple = 9,	/* 0.5 C	93.75 ms*/

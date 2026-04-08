@@ -49,32 +49,14 @@ uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
 uint8_t _refresh_sensor(struct temp_sensor *sensor)
 {
 /* TODO: handle possible read errors */
-	uint16_t time = 0;
 	uint8_t ret = 0;
 
 	/* exit if sensor disable */
 	if (!sensor->is_enable)
 		return ret;
 
-	switch (sensor->resolution) {		/* setup ds18b20 sensor measurement time */
-	case simple:
-		time = 100;		/* value rounded; to 9 bit */
-		break;
-	case standard:
-		time = 190;		/* value rounded; to 10 bit */
-		break;
-	case advanced:
-		time = 350;		/* default value; to 11 bit */
-		break;
-	case special:
-		time = 750;		/* defaut value; to 12 bit */
-		break;
-	default:
-		time = 750;
-		break;
-	}
-
-	if (sensor->_read_timer && (millis() - sensor->_read_timer >= time)) {
+	if (sensor->_read_timer &&
+	    (millis() - sensor->_read_timer >= sensor->req_interval)) {
 		/* temp ready, read it, set timer to 0 */
 		fl_t new_temp;
 

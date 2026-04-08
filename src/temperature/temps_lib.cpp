@@ -9,10 +9,11 @@
 
 /*
  * Setup individual sensor
+ * NOTE: this is a DS18B20-specific function
  *
  * @sensor - ptr to struct temp_sensor, here will be setted values
  * @obj - ptr to DallasTemperature obj, which can control multiple sensors
- * @res - resolution, will set to sensor->resolution
+ * @res - resolution, needed to calculate temp update time
  * @index - index of sensor in 1-Wire
  * @devices_count - count of expected devices on Wire
  *
@@ -25,6 +26,7 @@ uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
 			      uint8_t devices_count)
 {
 /* TODO: here setup the addresses of every sensor, etc... */
+	uint32_t interval = 0;
 
 	if (!sensor)
 		return struct_not_found_lib_ec;
@@ -40,7 +42,20 @@ uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
 	obj->getAddress(sensor->address, index);
 	obj->setResolution(sensor->address, res);
 	sensor->obj = obj;
-	sensor->resolution = res;
+
+	switch (res) {
+	case simple:
+		interval = DS18B20_9_BIT_TIME;
+	case standard:
+		interval = DS18B20_10_BIT_TIME;
+	case advanced:
+		interval = DS18B20_11_BIT_TIME;
+	case special:
+	default:
+		interval = DS18B20_12_BIT_TIME;
+	}
+
+	sensor->req_interval = interval;
 
 	return 0;
 }

@@ -12,7 +12,6 @@
  *		*obj		ptr to DallasTemperature class that control this sensor
  *		address		address of this sensor
  *
- *	RW	resolution	special (12 bit) or simple (9 bit)
  *	R	cur_temp	current temp, updating in background temps_lib_refresh() func
  *	R	prev_temp	previous temp, updating with every chage cur_temp:
  *					so, cur_temp will be as prev_temp, new val -> in cur_temp
@@ -181,7 +180,6 @@ struct temp_sensor {
 	DallasTemperature *obj;
 	DeviceAddress address;
 
-	enum accuracy resolution;
 	fl_t cur_temp;
 	fl_t prev_temp;
 	fl_t tar_temp;

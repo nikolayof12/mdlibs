@@ -4,7 +4,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-#include "lib/temps_lib.h"
+#include "temperature/temps_lib.h"
 
 
 /*

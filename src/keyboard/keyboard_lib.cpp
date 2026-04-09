@@ -2,7 +2,7 @@
 
 #include <EncButton.h>
 
-#include "lib/keyboards_lib.h"
+#include "keyboard/keyboard_lib.h"
 
 
 uint8_t keyboards_lib_init(struct keyboard_service *service)

@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
 
-#include "display_lib.h"
+#include "display/display_lib.h"
 
 
 

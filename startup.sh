@@ -11,11 +11,33 @@
 #TODO: make this script more interactive, such as the ability to specify the
 #      sketch upload port to as a command line argument
 
+# You can create your settings.sh file with variables and functions:
+#	compiler_extra_flags=""		# your compiler flags, such as include paths "-I./include"
 
 upload_args=""		# arguments for the upload_firmware() func
 compile_args=""		# arguments for the compile_firmware() func
+user_compile_flags=""	# loading from settings.sh
 
 default_firmware_file=./main/main.ino
+
+
+# $1 - settings file; default 'settings.sh'
+function load_settings()
+{
+	if [ -n "$1" ]
+	then
+		local settings_file=$1
+	else
+		local settings_file=./settings.sh
+	fi
+	if [ ! -f $settings_file ]
+	then
+		return
+	fi
+
+	source $settings_file
+	user_compile_flags+=$compiler_extra_flags
+}
 
 
 # $1 - main firmware file
@@ -36,7 +58,7 @@ function compile_firmware()
 
 	arduino-cli compile --fqbn arduino:avr:nano \
 		--build-property \
-			"compiler.cpp.extra_flags=-I./main/include/ -I./main/src/ -I./main/" \
+			"compiler.cpp.extra_flags=-I./main/include/ -I./main/src/ -I./main/ $user_compile_flags" \
 		$firmware_main_file
 }
 
@@ -136,5 +158,6 @@ function args_processing()
 
 
 args_processing $@
+load_settings
 compile_firmware $compile_args
 upload_firmware $upload_args

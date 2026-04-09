@@ -37,11 +37,9 @@ uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
 	if (obj->getDeviceCount() != devices_count)
 		return device_not_found_lib_ec;
 
-	TEMPS_SET_SENSOR_TO_ZERO(*sensor);
 
 	obj->getAddress(sensor->address, index);
 	obj->setResolution(sensor->address, res);
-	sensor->obj = obj;
 
 	switch (res) {
 	case simple:
@@ -56,6 +54,8 @@ uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
 	}
 
 	sensor->req_interval = interval;
+	sensor->obj = obj;
+	sensor->is_enable = true;
 
 	return 0;
 }

@@ -127,24 +127,6 @@
 #define TEMPS_REGISTER_ARR(name, count)				\
 	static struct temp_sensor (name)[(count)]
 
-/*
- * Set all fields of sensor to 0/NULL
- */
-#define TEMPS_SET_SENSOR_TO_ZERO(sensor)			\
-	do {							\
-		(sensor).obj = NULL;				\
-		/*(sensor).address = 0;		*/		\
-		(sensor).resolution = simple;  /* def simple */	\
-		(sensor).cur_temp = 0;				\
-		(sensor).prev_temp = 0;				\
-		(sensor).tar_temp = 0;				\
-		(sensor).changes_timer = 0;			\
-		(sensor).data = 0;				\
-		(sensor).errors = 0;				\
-		(sensor)._read_timer = 0;			\
-		(sensor).is_enable = 1;	/* default enable */	\
-	} while (0)
-
 
 /* alias to float, 255 mean 25.5, 777 mean 77.7, 1115 mean 111.5, etc, one sign afer dot */
 typedef uint16_t fl_t;

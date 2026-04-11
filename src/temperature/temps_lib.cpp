@@ -61,6 +61,30 @@ uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
 }
 
 
+/*
+ * The sensor initialization function.
+ * Run it after you've set all the values in your 'struct temp_sensor'.
+ * It will help identify issues with unset pointers
+ *
+ * @sensor - pointer to your sensor
+ *
+ * Return 0 if everything is fine, else TEMPS_*_INVALID macro
+ */
+uint8_t temps_lib_init_sensor(struct temp_sensor *sensor)
+{
+	if (!sensor->sensor_data)
+		return TEMPS_SENSOR_DATA_INVALID;
+
+	if (!sensor->read_temp)
+		return TEMPS_READ_TEMP_INVALID;
+
+	if (!sensor->request_temp)
+		return TEMPS_REQUEST_TEMP_INVALID;
+
+	return 0;
+}
+
+
 uint8_t _refresh_sensor(struct temp_sensor *sensor)
 {
 /* TODO: handle possible read errors */

@@ -175,6 +175,11 @@ void request_ds18b20(struct temp_sensor *senfor);
 #endif /* TEMPS_USE_DS18B20 */
 
 
+#define TEMPS_SENSOR_DATA_INVALID 22
+#define TEMPS_READ_TEMP_INVALID 23
+#define TEMPS_REQUEST_TEMP_INVALID 24
+
+
 struct temp_sensor {
 	/**
 	 * sensor-specific data;
@@ -207,6 +212,7 @@ uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
 			      enum accuracy res,
 			      uint8_t index,
 			      uint8_t devices_count);
+uint8_t temps_lib_init(struct temp_sensor *sensor);
 uint8_t temps_lib_refresh(struct temps_service *service);
 uint8_t *temps_lib_convert(fl_t num, uint8_t buff[5], uint8_t is_float);
 

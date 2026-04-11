@@ -207,11 +207,6 @@ struct temps_service {
 };
 
 
-uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
-			      DallasTemperature *obj,
-			      enum accuracy res,
-			      uint8_t index,
-			      uint8_t devices_count);
 uint8_t temps_lib_init(struct temp_sensor *sensor);
 uint8_t temps_lib_refresh(struct temps_service *service);
 uint8_t *temps_lib_convert(fl_t num, uint8_t buff[5], uint8_t is_float);

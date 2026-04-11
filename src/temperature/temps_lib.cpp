@@ -8,60 +8,6 @@
 
 
 /*
- * Setup individual sensor
- * NOTE: this is a DS18B20-specific function
- *
- * @sensor - ptr to struct temp_sensor, here will be setted values
- * @obj - ptr to DallasTemperature obj, which can control multiple sensors
- * @res - resolution, needed to calculate temp update time
- * @index - index of sensor in 1-Wire
- * @devices_count - count of expected devices on Wire
- *
- * return 0 if initialization is successful, else *_lib_ec error code
- */
-uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
-			      DallasTemperature *obj,
-			      enum accuracy res,
-			      uint8_t index,
-			      uint8_t devices_count)
-{
-/* TODO: here setup the addresses of every sensor, etc... */
-	uint32_t interval = 0;
-
-	if (!sensor)
-		return struct_not_found_lib_ec;
-
-	if (!obj)
-		return dt_obj_not_found_lib_ec;
-
-	if (obj->getDeviceCount() != devices_count)
-		return device_not_found_lib_ec;
-
-
-	obj->getAddress(sensor->address, index);
-	obj->setResolution(sensor->address, res);
-
-	switch (res) {
-	case simple:
-		interval = DS18B20_9_BIT_TIME;
-	case standard:
-		interval = DS18B20_10_BIT_TIME;
-	case advanced:
-		interval = DS18B20_11_BIT_TIME;
-	case special:
-	default:
-		interval = DS18B20_12_BIT_TIME;
-	}
-
-	sensor->req_interval = interval;
-	sensor->obj = obj;
-	sensor->is_enable = true;
-
-	return 0;
-}
-
-
-/*
  * The sensor initialization function.
  * Run it after you've set all the values in your 'struct temp_sensor'.
  * It will help identify issues with unset pointers

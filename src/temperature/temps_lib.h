@@ -11,6 +11,7 @@
  *	struct temp_sensor:
  *		*obj		ptr to DallasTemperature class that control this sensor
  *		address		address of this sensor
+ *	RW	*sensor_data	sensor-specific data; need for read_temp() and request_temp()
  *
  *	R	cur_temp	current temp, updating in background temps_lib_refresh() func
  *	R	prev_temp	previous temp, updating with every chage cur_temp:
@@ -20,6 +21,13 @@
  *	R	errors		if some errors in the read/cmp/other proccess, it's will be > 0
  *	RW	is_enable	if 0, sensor is not serviced, other fields are not updated
  *	RW	req_interval	request temp from sensor no more often than every req_interval ms
+ *
+ *	 W	read_temp	sensor-specific temperature request function;
+ *					the library thinks that you set this function;
+ *					the library calls it automatcally every 'req_interval' ms
+ *	 W	request_temp	sensor-specific temperature update function;
+ *					the library thinks that you set this function;
+ *					the library calls it automatcally
  *
  *		// internal data, you don't need to change it:
  *		_read_timer	timer between temp requests
@@ -162,6 +170,12 @@ struct temp_sensor {
 	DallasTemperature *obj;
 	DeviceAddress address;
 
+	/**
+	 * sensor-specific data;
+	 * store here everything you need for read_temp() and request_temp() funtions
+	 */
+	void *sensor_data;
+
 	fl_t cur_temp;
 	fl_t prev_temp;
 	fl_t tar_temp;
@@ -171,6 +185,9 @@ struct temp_sensor {
 	uint8_t errors;
 	bool is_enable;
 	uint32_t _read_timer;
+
+	fl_t (*read_temp)(struct temp_sensor *sensor); /* func to read finished temp */
+	void (*request_temp)(struct temp_sensor *sensor); /* func to request new temp */
 };
 
 struct temps_service {

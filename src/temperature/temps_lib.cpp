@@ -76,7 +76,8 @@ uint8_t _refresh_sensor(struct temp_sensor *sensor)
 		fl_t new_temp;
 
 		/* 10 - to convert float to fl_t: (77.7 * 10) = 777 that good */
-		new_temp = (fl_t)(sensor->obj->getTempC(sensor->address) * 10);
+		/* new_temp = (fl_t)(sensor->obj->getTempC(sensor->address) * 10); */
+		new_temp = sensor->read_temp(sensor);
 		if (new_temp != sensor->cur_temp) {
 			sensor->prev_temp = sensor->cur_temp;
 			sensor->changes_timer = millis();
@@ -88,7 +89,8 @@ uint8_t _refresh_sensor(struct temp_sensor *sensor)
 
 	if (!sensor->_read_timer) {
 		/* request temp, set timer */
-		sensor->obj->requestTemperaturesByAddress(sensor->address);
+		/* sensor->obj->requestTemperaturesByAddress(sensor->address); */
+		sensor->request_temp(sensor);
 		sensor->_read_timer = millis();
 	}
 

@@ -167,9 +167,6 @@ enum {
 
 
 struct temp_sensor {
-	DallasTemperature *obj;
-	DeviceAddress address;
-
 	/**
 	 * sensor-specific data;
 	 * store here everything you need for read_temp() and request_temp() funtions

@@ -11,16 +11,26 @@
  *	struct temp_sensor:
  *		*obj		ptr to DallasTemperature class that control this sensor
  *		address		address of this sensor
- *		resolution	special (12 bit) or simple (9 bit)
- *		cur_temp	current temp, updating in background temps_lib_refresh() func
- *		prev_temp	previous temp, updating with every chage cur_temp:
+ *	RW	*sensor_data	sensor-specific data; need for read_temp() and request_temp()
+ *
+ *	R	cur_temp	current temp, updating in background temps_lib_refresh() func
+ *	R	prev_temp	previous temp, updating with every chage cur_temp:
  *					so, cur_temp will be as prev_temp, new val -> in cur_temp
- *		tar_temp	just value to comparing
- *		changes_timer	millis(), when was entered into .prev_temp;
- *		errors		if some errors in the read/cmp/other proccess, it's will be > 0
- *		_read_timer	internal timer to between request temps
- *		cur_temp_str[5]	string representation about current temp, updating with cur_temp
- *		is_enable	if 0, sensor is not serviced, other fields are not updated
+ *	RW	tar_temp	just value to comparing
+ *	R	changes_timer	millis(), when was entered into .prev_temp;
+ *	R	errors		if some errors in the read/cmp/other proccess, it's will be > 0
+ *	RW	is_enable	if 0, sensor is not serviced, other fields are not updated
+ *	RW	req_interval	request temp from sensor no more often than every req_interval ms
+ *
+ *	 W	read_temp	sensor-specific temperature request function;
+ *					the library thinks that you set this function;
+ *					the library calls it automatcally every 'req_interval' ms
+ *	 W	request_temp	sensor-specific temperature update function;
+ *					the library thinks that you set this function;
+ *					the library calls it automatcally
+ *
+ *		// internal data, you don't need to change it:
+ *		_read_timer	timer between temp requests
  *
  *	General structure:
  *	struct temps_service:
@@ -125,30 +135,21 @@
 #define TEMPS_REGISTER_ARR(name, count)				\
 	static struct temp_sensor (name)[(count)]
 
-/*
- * Set all fields of sensor to 0/NULL
- */
-#define TEMPS_SET_SENSOR_TO_ZERO(sensor)			\
-	do {							\
-		(sensor).obj = NULL;				\
-		/*(sensor).address = 0;		*/		\
-		(sensor).resolution = simple;  /* def simple */	\
-		(sensor).cur_temp = 0;				\
-		(sensor).prev_temp = 0;				\
-		(sensor).tar_temp = 0;				\
-		(sensor).changes_timer = 0;			\
-		(sensor).data = 0;				\
-		(sensor).errors = 0;				\
-		(sensor)._read_timer = 0;			\
-		(sensor).is_enable = 1;	/* default enable */	\
-	} while (0)
-
 
 /* alias to float, 255 mean 25.5, 777 mean 77.7, 1115 mean 111.5, etc, one sign afer dot */
 typedef uint16_t fl_t;
 
 
 #ifdef TEMPS_USE_DS18B20
+
+#define DS18B20_MAX_TEMP 125
+#define DS18B20_MIN_TEMP -55
+
+#define DS18B20_9_BIT_TIME 95
+#define DS18B20_10_BIT_TIME 190
+#define DS18B20_11_BIT_TIME 350
+#define DS18B20_12_BIT_TIME 750
+
 enum accuracy {
 			/* resolution	time */
 	simple = 9,	/* 0.5 C	93.75 ms*/
@@ -162,23 +163,42 @@ enum {
 	struct_not_found_lib_ec = 61,
 	dt_obj_not_found_lib_ec = 62,	/* DallasTemperature */
 };
-#endif
+
+struct ds18b20 {
+	DallasTemperature *obj;
+	DeviceAddress address;
+};
+
+fl_t read_ds18b20(struct temp_sensor *sensor);
+void request_ds18b20(struct temp_sensor *senfor);
+
+#endif /* TEMPS_USE_DS18B20 */
+
+
+#define TEMPS_SENSOR_DATA_INVALID 22
+#define TEMPS_READ_TEMP_INVALID 23
+#define TEMPS_REQUEST_TEMP_INVALID 24
 
 
 struct temp_sensor {
-	DallasTemperature *obj;
-	DeviceAddress address;
+	/**
+	 * sensor-specific data;
+	 * store here everything you need for read_temp() and request_temp() funtions
+	 */
+	void *sensor_data;
 
-	enum accuracy resolution;
 	fl_t cur_temp;
 	fl_t prev_temp;
 	fl_t tar_temp;
 	uint32_t changes_timer;		/* millis(), when value was entered into 'prev_temp' */
 	uint32_t data;			/* user data about this sensor */
-	uint8_t cur_temp_str[5];	/* buff to str representation of cur_temp */
+	uint32_t req_interval;		/* request temp no more often than every req_interval ms */
 	uint8_t errors;
-	uint8_t is_enable;		/* 0 - disable, 1 - enable */
+	bool is_enable;
 	uint32_t _read_timer;
+
+	fl_t (*read_temp)(struct temp_sensor *sensor); /* func to read finished temp */
+	void (*request_temp)(struct temp_sensor *sensor); /* func to request new temp */
 };
 
 struct temps_service {
@@ -187,11 +207,7 @@ struct temps_service {
 };
 
 
-uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
-			      DallasTemperature *obj,
-			      enum accuracy res,
-			      uint8_t index,
-			      uint8_t devices_count);
+uint8_t temps_lib_init(struct temp_sensor *sensor);
 uint8_t temps_lib_refresh(struct temps_service *service);
 uint8_t *temps_lib_convert(fl_t num, uint8_t buff[5], uint8_t is_float);
 

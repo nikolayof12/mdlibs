@@ -8,39 +8,24 @@
 
 
 /*
- * Setup individual sensor
+ * The sensor initialization function.
+ * Run it after you've set all the values in your 'struct temp_sensor'.
+ * It will help identify issues with unset pointers
  *
- * @sensor - ptr to struct temp_sensor, here will be setted values
- * @obj - ptr to DallasTemperature obj, which can control multiple sensors
- * @res - resolution, will set to sensor->resolution
- * @index - index of sensor in 1-Wire
- * @devices_count - count of expected devices on Wire
+ * @sensor - pointer to your sensor
  *
- * return 0 if initialization is successful, else *_lib_ec error code
+ * Return 0 if everything is fine, else TEMPS_*_INVALID macro
  */
-uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
-			      DallasTemperature *obj,
-			      enum accuracy res,
-			      uint8_t index,
-			      uint8_t devices_count)
+uint8_t temps_lib_init_sensor(struct temp_sensor *sensor)
 {
-/* TODO: here setup the addresses of every sensor, etc... */
+	if (!sensor->sensor_data)
+		return TEMPS_SENSOR_DATA_INVALID;
 
-	if (!sensor)
-		return struct_not_found_lib_ec;
+	if (!sensor->read_temp)
+		return TEMPS_READ_TEMP_INVALID;
 
-	if (!obj)
-		return dt_obj_not_found_lib_ec;
-
-	if (obj->getDeviceCount() != devices_count)
-		return device_not_found_lib_ec;
-
-	TEMPS_SET_SENSOR_TO_ZERO(*sensor);
-
-	obj->getAddress(sensor->address, index);
-	obj->setResolution(sensor->address, res);
-	sensor->obj = obj;
-	sensor->resolution = res;
+	if (!sensor->request_temp)
+		return TEMPS_REQUEST_TEMP_INVALID;
 
 	return 0;
 }
@@ -49,43 +34,20 @@ uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
 uint8_t _refresh_sensor(struct temp_sensor *sensor)
 {
 /* TODO: handle possible read errors */
-	uint16_t time = 0;
 	uint8_t ret = 0;
-	uint8_t is_float;
 
 	/* exit if sensor disable */
 	if (!sensor->is_enable)
 		return ret;
 
-	switch (sensor->resolution) {		/* setup ds18b20 sensor measurement time */
-	case simple:
-		time = 100;		/* value rounded; to 9 bit */
-		is_float = 0;
-		break;
-	case standard:
-		time = 190;		/* value rounded; to 10 bit */
-		is_float = 0;
-		break;
-	case advanced:
-		time = 350;		/* default value; to 11 bit */
-		is_float = 0;
-		break;
-	case special:
-		time = 750;		/* defaut value; to 12 bit */
-		is_float = 1;
-		break;
-	default:
-		time = 750;
-		is_float = 1;
-		break;
-	}
-
-	if (sensor->_read_timer && (millis() - sensor->_read_timer >= time)) {
+	if (sensor->_read_timer &&
+	    (millis() - sensor->_read_timer >= sensor->req_interval)) {
 		/* temp ready, read it, set timer to 0 */
 		fl_t new_temp;
 
 		/* 10 - to convert float to fl_t: (77.7 * 10) = 777 that good */
-		new_temp = (fl_t)(sensor->obj->getTempC(sensor->address) * 10);
+		/* new_temp = (fl_t)(sensor->obj->getTempC(sensor->address) * 10); */
+		new_temp = sensor->read_temp(sensor);
 		if (new_temp != sensor->cur_temp) {
 			sensor->prev_temp = sensor->cur_temp;
 			sensor->changes_timer = millis();
@@ -93,14 +55,12 @@ uint8_t _refresh_sensor(struct temp_sensor *sensor)
 
 		sensor->cur_temp = new_temp;
 		sensor->_read_timer = 0;	/* neccessary */
-
-		/* save str value of cur_temp to buff */
-		temps_lib_convert(sensor->cur_temp, sensor->cur_temp_str, is_float);
 	}
 
 	if (!sensor->_read_timer) {
 		/* request temp, set timer */
-		sensor->obj->requestTemperaturesByAddress(sensor->address);
+		/* sensor->obj->requestTemperaturesByAddress(sensor->address); */
+		sensor->request_temp(sensor);
 		sensor->_read_timer = millis();
 	}
 
@@ -225,3 +185,24 @@ uint8_t *temps_lib_convert(fl_t num, uint8_t buff[5], uint8_t is_float)
 
 	return buff;
 }
+
+
+#ifdef TEMPS_USE_DS18B20
+fl_t read_ds18b20(struct temp_sensor *sensor)
+{
+	struct ds18b20 *sensor_data = sensor->sensor_data;
+	DallasTemperature *obj = data->obj;
+
+	/* 10 - to convert float to fl_t: (77.7 * 10) = 777 that good */
+	return (fl_t)(obj->getTempC(sensor_data->address) * 10);
+}
+
+
+void request_ds18b20(struct temp_sensor *sensor)
+{
+	struct ds18b20 *sensor_data = sensor->sensor_data;
+	DallasTemperature *obj = data->obj;
+
+	return obj->requestTemperaturesByAddress(sensor_data->address);
+}
+#endif /* TEMPS_USE_DS18B20 */

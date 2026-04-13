@@ -16,7 +16,7 @@
  *
  * Return 0 if everything is fine, else TEMPS_*_INVALID macro
  */
-uint8_t temps_lib_init_sensor(struct temp_sensor *sensor)
+uint8_t temps_lib_init(struct temp_sensor *sensor)
 {
 	if (!sensor->sensor_data)
 		return TEMPS_SENSOR_DATA_INVALID;
@@ -191,7 +191,7 @@ uint8_t *temps_lib_convert(fl_t num, uint8_t buff[5], uint8_t is_float)
 fl_t read_ds18b20(struct temp_sensor *sensor)
 {
 	struct ds18b20 *sensor_data = sensor->sensor_data;
-	DallasTemperature *obj = data->obj;
+	DallasTemperature *obj = sensor_data->obj;
 
 	/* 10 - to convert float to fl_t: (77.7 * 10) = 777 that good */
 	return (fl_t)(obj->getTempC(sensor_data->address) * 10);
@@ -201,8 +201,8 @@ fl_t read_ds18b20(struct temp_sensor *sensor)
 void request_ds18b20(struct temp_sensor *sensor)
 {
 	struct ds18b20 *sensor_data = sensor->sensor_data;
-	DallasTemperature *obj = data->obj;
+	DallasTemperature *obj = sensor_data->obj;
 
-	return obj->requestTemperaturesByAddress(sensor_data->address);
+	obj->requestTemperaturesByAddress(sensor_data->address);
 }
 #endif /* TEMPS_USE_DS18B20 */

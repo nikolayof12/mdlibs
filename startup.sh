@@ -17,6 +17,7 @@
 upload_args=""		# arguments for the upload_firmware() func
 compile_args=""		# arguments for the compile_firmware() func
 user_compile_flags=""	# loading from settings.sh
+output_dir=./output/	# default directory with output files
 
 default_firmware_file=./main/main.ino
 
@@ -56,10 +57,28 @@ function compile_firmware()
 	fi
 
 
+	# --output-dir		// here are all the binary files
+	# --clean		// don't use cache
 	arduino-cli compile --fqbn arduino:avr:nano \
 		--build-property \
 			"compiler.cpp.extra_flags=-I./main/include/ -I./main/src/ -I./main/ $user_compile_flags" \
+		--output-dir "$output_dir" \
+		--clean \
 		$firmware_main_file
+
+
+	# create an assembler representation of the firmware
+	local asm_file="$output_dir/"
+	local elf_file="$output_dir/"
+	asm_file+=$(basename "$firmware_main_file")
+	elf_file+=$(basename "$firmware_main_file")
+	asm_file+=".asm"
+	elf_file+=".elf"
+
+	# -D		// disassemble all sections
+	# -C		// make symbol names more understandable
+	# -S		// display C/C++ code as well; it must be compiled with debug info '-g'
+	avr-objdump -D -C -S $elf_file >> $asm_file
 }
 
 
@@ -108,6 +127,7 @@ Available command line arguments:
   --help			display this help and exit
   --device-file PATH		path to the file representing your microcontroller
   --firmware-file PATH		path to the main firmware file to pass it in compile func
+  --output-dir PATH		path to the directory for storing output files; default $output_dir
 
 Examples:
   ./startup.sh					just run if your load device is /dev/ttyUSB0
@@ -142,6 +162,16 @@ function args_processing()
 				compile_args+="$2"
 			else
 				echo "You need to specify the main firmware file"
+				exit 2
+			fi
+			shift
+			;;
+		--output-dir)
+			if [ -n "$2" ]
+			then
+				output_dir="$2"
+			else
+				echo "You need to specify the output directory"
 				exit 2
 			fi
 			shift

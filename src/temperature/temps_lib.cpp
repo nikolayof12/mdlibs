@@ -203,6 +203,6 @@ void request_ds18b20(struct temp_sensor *sensor)
 	struct ds18b20 *sensor_data = sensor->sensor_data;
 	DallasTemperature *obj = sensor_data->obj;
 
-	return obj->requestTemperaturesByAddress(sensor_data->address);
+	obj->requestTemperaturesByAddress(sensor_data->address);
 }
 #endif /* TEMPS_USE_DS18B20 */

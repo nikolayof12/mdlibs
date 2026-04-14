@@ -140,12 +140,6 @@ typedef uint16_t fl_t;
 #define DS18B20_11_BIT_TIME 350
 #define DS18B20_12_BIT_TIME 750
 
-enum {
-	device_not_found_lib_ec = 60,
-	struct_not_found_lib_ec = 61,
-	dt_obj_not_found_lib_ec = 62,	/* DallasTemperature */
-};
-
 struct ds18b20 {
 	DallasTemperature *obj;
 	DeviceAddress address;

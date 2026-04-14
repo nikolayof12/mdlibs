@@ -44,7 +44,7 @@
  *
  *	Usage:
  *
- *	So, we have 2 sensors on D8 pin, and 3 on D10 pin;
+ *	So, we have 2 DS18B20 sensors on D8 pin, and 3 on D10 pin;
  *	Sensors from D8 pin need set to 12 bit,
  *	Sensors from D10 pin - to 9 bit.
  *
@@ -54,45 +54,23 @@
  *	TEMPS_REGISTER_SENSORS_PIN(warn_sensors, 8);	// here 2 sensors
  *	TEMPS_REGISTER_SENSORS_PIN(def_sensors, 10);	// here 3
  *
- *	// just array, without set OneWire/DallasTemperature
- *	TEMPS_REGISTER_ARR(sensors_arr, ALL_COUNT_OF_SENSORS);
+ *	// create an arrays manually
+ *	struct temp_sensor sensors_arr[COUNT_OF_SENSORS];
  *
  *	void some_init_func(struct temps_service *temps)
  *	{
  *		temps->sensors = sensors_arr;
- *		temps->sensors_count = ALL_COUNT_OF_SENSORS;
+ *		temps->sensors_count = COUNT_OF_SENSORS;
  *
- *		// sensor found or not, for example, next do it for all your sensors
  *		if (warn_sensor.getDeviceCount() != 2)
- *			return ERROR
- *		...	// other sensors
+ *			return ERROR;
  *
- *		// need call before all temps_lib_init_sensor() sensors
+ *		if (def_sensors.getDeviceCount() < 3)
+ *			;	// do something
+ *
  *		warn_sensors.begin();
  *		def_sensors.begin();
  *
- *		temps_lib_init_sensor(&temps->sensors[0],
- *				      &warn_sensors,
- *				      special,			// set resolution here
- *				      0, 1);
- *		temps_lib_init_sensor(&temps->sensors[1],
- *				      &warn_sensors,
- *				      special,
- *				      0, 1);
- *
- *
- *		temps_lib_init_sensor(&temps->sensors[2],
- *				      &def_sensors,
- *				      simple,
- *				      0, 0);
- *		temps_lib_init_sensor(&temps->sensors[3],
- *				      &def_sensors,
- *				      simple,
- *				      0, 1);
- *		temps_lib_init_sensor(&temps->sensors[4],
- *				      &def_sensors,
- *				      simple,
- *				      0, 2);
  *
  *		// manually set the async mode
  *		warn_sensors.setWaitForConversion(false);

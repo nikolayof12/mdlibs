@@ -78,7 +78,7 @@ function compile_firmware()
 	# -D		// disassemble all sections
 	# -C		// make symbol names more understandable
 	# -S		// display C/C++ code as well; it must be compiled with debug info '-g'
-	avr-objdump -D -C -S $elf_file >> $asm_file
+	avr-objdump -D -C -S $elf_file > $asm_file
 }
 
 

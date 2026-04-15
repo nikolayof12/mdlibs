@@ -49,8 +49,8 @@
  *	#define COUNT_OF_SENSORS 5
  *
  *	// here register DallasTemperature objects
- *	TEMPS_REGISTER_SENSORS_PIN(warn_sensors, 8);	// here 2 sensors
- *	TEMPS_REGISTER_SENSORS_PIN(def_sensors, 10);	// here 3
+ *	TEMPS_REGISTER_DS18B20_PIN(warn_sensors, 8);	// here 2 sensors
+ *	TEMPS_REGISTER_DS18B20_PIN(def_sensors, 10);	// here 3
  *
  *	// create an arrays manually
  *	struct temp_sensor sensors_arr[COUNT_OF_SENSORS];
@@ -83,18 +83,6 @@
 #define TEMPS_USE_DS18B20
 #endif
 
-/*
- * Register new OneWire, DallasTemperature objects to management sensors
- * Call once for each temperature pin
- *
- * @name - name for new DallasTemperature object
- * @pin - pin on which the sensor/sensors are located
- */
-#define TEMPS_REGISTER_SENSORS_PIN(name, pin)			\
-	static OneWire name ##_wire((pin));			\
-	static DallasTemperature name(&(name ## _wire))
-
-
 /**
  * Alias to float, one digit after the decimal point
  * 255 mean 25.5, 777 mean 77.7, 1115 -> 111.5
@@ -112,6 +100,18 @@ typedef uint16_t fl_t;
 #define DS18B20_10_BIT_TIME 190
 #define DS18B20_11_BIT_TIME 350
 #define DS18B20_12_BIT_TIME 750
+
+/**
+ * Register new OneWire, DallasTemperature objects to management DS18B20 sensors
+ * Call once for each pin
+ *
+ * @name - name for new DallasTemperature object
+ * @pin - pin on which the sensor/sensors are located
+ */
+#define TEMPS_REGISTER_DS18B20_PIN(name, pin)			\
+	static OneWire name ##_wire((pin));			\
+	static DallasTemperature name(&(name ## _wire))
+
 
 struct ds18b20 {
 	DallasTemperature *obj;

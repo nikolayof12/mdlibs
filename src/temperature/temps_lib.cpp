@@ -31,7 +31,7 @@ uint8_t temps_lib_init(struct temp_sensor *sensor)
 }
 
 
-uint8_t _refresh_sensor(struct temp_sensor *sensor)
+static uint8_t _refresh_sensor(struct temp_sensor *sensor)
 {
 /* TODO: handle possible read errors */
 	uint8_t ret = 0;

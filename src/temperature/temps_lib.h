@@ -30,15 +30,16 @@
  *
  *	General structure:
  *	struct temps_service:
- *		sensors		array of sensors
- *		sensors_count	length of sensors array
+ *	RW	sensors		array of sensors
+ *	RW	sensors_count	length of sensors array
  *		
+ *	NOTE: R/W/RW - you can read/write this values
  *
- *	You must define:
+ *	You can define:
  *		#define TEMPS_USE_DS18B20	// to use DS18B20 sensor
  *
  *
- *	Usage:
+ *	Use on the example of DS18B20:
  *
  *	So, we have 2 DS18B20 sensors on D8 pin, and 3 on D10 pin;
  *	Sensors from D8 pin need set to 12 bit,
@@ -52,11 +53,15 @@
  *
  *	// create an arrays manually
  *	struct temp_sensor sensors_arr[COUNT_OF_SENSORS];
+ *	struct ds18b20 sensors_data[COUNT_OF_SENSORS];
  *
- *	void some_init_func(struct temps_service *temps)
+ *	void init_my_ds18b20_sensors(struct temps_service *temps)
  *	{
  *		temps->sensors = sensors_arr;
  *		temps->sensors_count = COUNT_OF_SENSORS;
+ *
+ *		warn_sensors.begin();
+ *		def_sensors.begin();
  *
  *		if (warn_sensor.getDeviceCount() != 2)
  *			return ERROR;
@@ -64,11 +69,68 @@
  *		if (def_sensors.getDeviceCount() < 3)
  *			;	// do something
  *
- *		warn_sensors.begin();
- *		def_sensors.begin();
+ *		// set DallasTemperature objects
+ *		sensors_data[0].obj = &def_sensors;
+ *		sensors_data[1].obj = &def_sensors;
+ *		sensors_data[2].obj = &def_sensors;
+ *		sensors_data[3].obj = &ward_sensors;
+ *		sensors_data[4].obj = &ward_sensors;
  *
+ *		// find and set DS18B20 addresses
+ *		sensors_data[0].obj->getAddress(sensors_data[0].address, 0);
+ *		sensors_data[1].obj->getAddress(sensors_data[1].address, 1);
+ *		sensors_data[2].obj->getAddress(sensors_data[2].address, 2);
+ *		sensors_data[3].obj->getAddress(sensors_data[3].address, 0); // 0 because other pin
+ *		sensors_data[4].obj->getAddress(sensors_data[4].address, 1);
  *
- *		// manually set the async mode
+ *		// set resolutions
+ *		sensors_data[0].obj->setResolution(sensors_data[0].address, 9);
+ *		sensors_data[1].obj->setResolution(sensors_data[1].address, 9);
+ *		sensors_data[2].obj->setResolution(sensors_data[2].address, 9);
+ *		sensors_data[3].obj->setResolution(sensors_data[3].address, 12);
+ *		sensors_data[4].obj->setResolution(sensors_data[4].address, 12);
+ *
+ *		// set structures
+ *		temps->sensors[0].sensor_data = &sensor_data[0];
+ *		temps->sensors[1].sensor_data = &sensor_data[1];
+ *		temps->sensors[2].sensor_data = &sensor_data[2];
+ *		temps->sensors[3].sensor_data = &sensor_data[3];
+ *		temps->sensors[4].sensor_data = &sensor_data[4];
+ *
+ *		// set read/request functions
+ *		temps->sensors[0].read_temp = &read_ds18b20;
+ *		temps->sensors[0].request_temp = &request_ds18b20;
+ *		temps->sensors[1].read_temp = &read_ds18b20;
+ *		temps->sensors[1].request_temp = &request_ds18b20;
+ *		temps->sensors[2].read_temp = &read_ds18b20;
+ *		temps->sensors[2].request_temp = &request_ds18b20;
+ *		temps->sensors[3].read_temp = &read_ds18b20;
+ *		temps->sensors[3].request_temp = &request_ds18b20;
+ *		temps->sensors[4].read_temp = &read_ds18b20;
+ *		temps->sensors[4].request_temp = &request_ds18b20;
+ *
+ *		// set timeouts
+ *		temps->sensors[0].req_interval = DS18B20_9_BIT_TIME;
+ *		temps->sensors[1].req_interval = DS18B20_9_BIT_TIME;
+ *		temps->sensors[2].req_interval = DS18B20_9_BIT_TIME;
+ *		temps->sensors[3].req_interval = DS18B20_12_BIT_TIME;
+ *		temps->sensors[4].req_interval = DS18B20_12_BIT_TIME;
+ *
+ *		// enable
+ *		temps->sensors[0].is_enable = true;
+ *		temps->sensors[1].is_enable = true;
+ *		temps->sensors[2].is_enable = true;
+ *		temps->sensors[3].is_enable = true;
+ *		temps->sensors[4].is_enable = true;
+ *
+ *		// check
+ *		for (int i = 0; i < temps->sensors_count; i++) {
+ *			int ret = temps_lib_init(&temps->sensors[i]);
+ *			if (ret)
+ *				;	// do something
+ *		}
+ *
+ *		// set the async mode
  *		warn_sensors.setWaitForConversion(false);
  *		def_sensors.setWaitForConversion(false);
  *	}

@@ -21,12 +21,9 @@
  *	variables with the value of their number.
  *
  *	The library offers you a list of macros that create global static keyboard element
- *	objects and arrays of structures for them:
+ *	objects:
  *		- KEYBOARDS_REGISTER_BUTTON();
- *
  *		- KEYBOARDS_REGISTER_ENCODER();
- *
- *		- KEYBOARDS_REGISTER_SERVICE_STRUCT();
  *
  *
  *	Usage:
@@ -41,7 +38,7 @@
  * KEYBOARDS_REGISTER_BUTTON(back, 9);
  * struct button my_buttons[3];
  *
- * KEYBOARDS_REGISTER_SERVICE_STRUCT(my_keyboard);
+ * struct keyboard_service my_keyboard;
  *
  * uint8_t some_init_func(void)
  * {
@@ -121,20 +118,6 @@
 		.right_pressed_turn = NULL,				\
 		.click = NULL,						\
 		.obj = &(_enc_ ## name)					\
-	}
-
-
-/*
- * Register new 'struct keyboard_service' for all your keyboard items
- *
- * @name - name for new 'struct keyboard_service' object
- */
-#define KEYBOARDS_REGISTER_SERVICE_STRUCT(name)				\
-	static struct keyboard_service (name) = {			\
-		.encoders = NULL,					\
-		.encoders_count = 0,					\
-		.buttons = NULL,					\
-		.buttons_count = 0					\
 	}
 
 

@@ -26,7 +26,6 @@
  *		- KEYBOARDS_REGISTER_BUTTONS_ARRAY();
  *
  *		- KEYBOARDS_REGISTER_ENCODER();
- *		- KEYBOARDS_REGISTER_ENCODERS_ARRAY();
  *
  *		- KEYBOARDS_REGISTER_SERVICE_STRUCT();
  *
@@ -36,7 +35,7 @@
  *
  *
  * KEYBOARDS_REGISTER_ENCODER(enc_menu, 3, 4, 5);
- * KEYBOARDS_REGISTER_ENCODERS_ARRAY(my_encoders, 1);
+ * struct encoder my_encoders[1];
  *
  * KEYBOARDS_REGISTER_BUTTON(accept, 7);
  * KEYBOARDS_REGISTER_BUTTON(cancel, 8);
@@ -133,14 +132,6 @@
 		.obj = &(_enc_ ## name)					\
 	}
 
-/*
- * Register new array of 'struct encoder' objects for all your encoders
- *
- * @name - name for new array
- * @size - count of 'struct encoder' items in array
- */
-#define KEYBOARDS_REGISTER_ENCODERS_ARRAY(name, size)			\
-	static struct encoder (name)[(size)]
 
 /*
  * Register new 'struct keyboard_service' for all your keyboard items

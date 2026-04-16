@@ -23,7 +23,6 @@
  *	The library offers you a list of macros that create global static keyboard element
  *	objects and arrays of structures for them:
  *		- KEYBOARDS_REGISTER_BUTTON();
- *		- KEYBOARDS_REGISTER_BUTTONS_ARRAY();
  *
  *		- KEYBOARDS_REGISTER_ENCODER();
  *
@@ -40,7 +39,7 @@
  * KEYBOARDS_REGISTER_BUTTON(accept, 7);
  * KEYBOARDS_REGISTER_BUTTON(cancel, 8);
  * KEYBOARDS_REGISTER_BUTTON(back, 9);
- * KEYBOARDS_REGISTER_BUTTONS_ARRAY(my_buttons, 3);
+ * struct button my_buttons[3];
  *
  * KEYBOARDS_REGISTER_SERVICE_STRUCT(my_keyboard);
  *
@@ -104,14 +103,6 @@
 		.obj = &(_btn_ ## name)					\
 	}
 
-/*
- * Register new array of 'struct button' objects for all your buttons
- *
- * @name - name for new array
- * @size - count of 'struct button' items in array
- */
-#define KEYBOARDS_REGISTER_BUTTONS_ARRAY(name, size)			\
-	static struct button (name)[(size)]
 
 /*
  * Register new 'struct encoder' static variable to encoder control

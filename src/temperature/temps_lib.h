@@ -2,183 +2,221 @@
 #define TEMPS_LIB_H
 
 #include <stdint.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
 
 /*	Overview:
  *
  *	Library for management temperature sensors, in control about every sensor:
  *	struct temp_sensor:
- *		*obj		ptr to DallasTemperature class that control this sensor
- *		address		address of this sensor
- *		resolution	special (12 bit) or simple (9 bit)
- *		cur_temp	current temp, updating in background temps_lib_refresh() func
- *		prev_temp	previous temp, updating with every chage cur_temp:
+ *	RW	*sensor_data	sensor-specific data; need for read_temp() and request_temp()
+ *	R	cur_temp	current temp, updating in background temps_lib_refresh() func
+ *	R	prev_temp	previous temp, updating with every chage cur_temp:
  *					so, cur_temp will be as prev_temp, new val -> in cur_temp
- *		tar_temp	just value to comparing
- *		changes_timer	millis(), when was entered into .prev_temp;
- *		errors		if some errors in the read/cmp/other proccess, it's will be > 0
- *		_read_timer	internal timer to between request temps
- *		cur_temp_str[5]	string representation about current temp, updating with cur_temp
- *		is_enable	if 0, sensor is not serviced, other fields are not updated
+ *	RW	tar_temp	just your value; library doesn't use this
+ *	R	changes_timer	millis(), when was entered into .prev_temp;
+ *	R	errors		if some errors in the read/cmp/other proccess, it's will be > 0
+ *	RW	is_enable	if false, sensor is not serviced, other fields are not updated
+ *	RW	req_interval	call request_temp() and read_temp() no more often than every
+ *					req_interval ms
+ *	RW	data		your private data; library doesn't use this; maybe replace to ptr?
+ *	 W	read_temp	sensor-specific temperature read function pointer;
+ *					the library thinks that you set this pointer;
+ *					the library calls it automatcally every 'req_interval' ms
+ *	 W	request_temp	sensor-specific temperature update function pointer;
+ *					the library thinks that you set this pointer;
+ *					the library calls it automatcally every 'req_interval' ms
+ *
+ *		// internal data, you don't need to change it:
+ *		_read_timer	timer between temp requests
  *
  *	General structure:
  *	struct temps_service:
- *		sensors		array of sensors
- *		sensors_count	length of sensors array
+ *	RW	sensors		array of sensors
+ *	RW	sensors_count	length of sensors array
  *		
+ *	NOTE: R/W/RW - you can read/write this values
  *
- *	You must define:
+ *	You can define:
  *		#define TEMPS_USE_DS18B20	// to use DS18B20 sensor
  *
  *
- *	Usage:
+ *	Use on the example of DS18B20:
  *
- *	So, we have 2 sensors on D8 pin, and 3 on D10 pin;
+ *	So, we have 2 DS18B20 sensors on D8 pin, and 3 on D10 pin;
  *	Sensors from D8 pin need set to 12 bit,
  *	Sensors from D10 pin - to 9 bit.
  *
  *	#define COUNT_OF_SENSORS 5
  *
  *	// here register DallasTemperature objects
- *	TEMPS_REGISTER_SENSORS_PIN(warn_sensors, 8);	// here 2 sensors
- *	TEMPS_REGISTER_SENSORS_PIN(def_sensors, 10);	// here 3
+ *	TEMPS_REGISTER_DS18B20_PIN(warn_sensors, 8);	// here 2 sensors
+ *	TEMPS_REGISTER_DS18B20_PIN(def_sensors, 10);	// here 3
  *
- *	// just array, without set OneWire/DallasTemperature
- *	TEMPS_REGISTER_ARR(sensors_arr, ALL_COUNT_OF_SENSORS);
+ *	// create an arrays manually
+ *	struct temp_sensor sensors_arr[COUNT_OF_SENSORS];
+ *	struct ds18b20 sensors_data[COUNT_OF_SENSORS];
  *
- *	void some_init_func(struct temps_service *temps)
+ *	void init_my_ds18b20_sensors(struct temps_service *temps)
  *	{
  *		temps->sensors = sensors_arr;
- *		temps->sensors_count = ALL_COUNT_OF_SENSORS;
+ *		temps->sensors_count = COUNT_OF_SENSORS;
  *
- *		// sensor found or not, for example, next do it for all your sensors
- *		if (warn_sensor.getDeviceCount() != 2)
- *			return ERROR
- *		...	// other sensors
- *
- *		// need call before all temps_lib_init_sensor() sensors
  *		warn_sensors.begin();
  *		def_sensors.begin();
  *
- *		temps_lib_init_sensor(&temps->sensors[0],
- *				      &warn_sensors,
- *				      special,			// set resolution here
- *				      0, 1);
- *		temps_lib_init_sensor(&temps->sensors[1],
- *				      &warn_sensors,
- *				      special,
- *				      0, 1);
+ *		if (warn_sensor.getDeviceCount() != 2)
+ *			return ERROR;
  *
+ *		if (def_sensors.getDeviceCount() < 3)
+ *			;	// do something
  *
- *		temps_lib_init_sensor(&temps->sensors[2],
- *				      &def_sensors,
- *				      simple,
- *				      0, 0);
- *		temps_lib_init_sensor(&temps->sensors[3],
- *				      &def_sensors,
- *				      simple,
- *				      0, 1);
- *		temps_lib_init_sensor(&temps->sensors[4],
- *				      &def_sensors,
- *				      simple,
- *				      0, 2);
+ *		// set DallasTemperature objects
+ *		sensors_data[0].obj = &def_sensors;
+ *		sensors_data[1].obj = &def_sensors;
+ *		sensors_data[2].obj = &def_sensors;
+ *		sensors_data[3].obj = &ward_sensors;
+ *		sensors_data[4].obj = &ward_sensors;
  *
- *		// manually set the async mode
+ *		// find and set DS18B20 addresses
+ *		sensors_data[0].obj->getAddress(sensors_data[0].address, 0);
+ *		sensors_data[1].obj->getAddress(sensors_data[1].address, 1);
+ *		sensors_data[2].obj->getAddress(sensors_data[2].address, 2);
+ *		sensors_data[3].obj->getAddress(sensors_data[3].address, 0); // 0 because other pin
+ *		sensors_data[4].obj->getAddress(sensors_data[4].address, 1);
+ *
+ *		// set resolutions
+ *		sensors_data[0].obj->setResolution(sensors_data[0].address, 9);
+ *		sensors_data[1].obj->setResolution(sensors_data[1].address, 9);
+ *		sensors_data[2].obj->setResolution(sensors_data[2].address, 9);
+ *		sensors_data[3].obj->setResolution(sensors_data[3].address, 12);
+ *		sensors_data[4].obj->setResolution(sensors_data[4].address, 12);
+ *
+ *		// set structures
+ *		temps->sensors[0].sensor_data = &sensor_data[0];
+ *		temps->sensors[1].sensor_data = &sensor_data[1];
+ *		temps->sensors[2].sensor_data = &sensor_data[2];
+ *		temps->sensors[3].sensor_data = &sensor_data[3];
+ *		temps->sensors[4].sensor_data = &sensor_data[4];
+ *
+ *		// set read/request functions
+ *		temps->sensors[0].read_temp = &read_ds18b20;
+ *		temps->sensors[0].request_temp = &request_ds18b20;
+ *		temps->sensors[1].read_temp = &read_ds18b20;
+ *		temps->sensors[1].request_temp = &request_ds18b20;
+ *		temps->sensors[2].read_temp = &read_ds18b20;
+ *		temps->sensors[2].request_temp = &request_ds18b20;
+ *		temps->sensors[3].read_temp = &read_ds18b20;
+ *		temps->sensors[3].request_temp = &request_ds18b20;
+ *		temps->sensors[4].read_temp = &read_ds18b20;
+ *		temps->sensors[4].request_temp = &request_ds18b20;
+ *
+ *		// set timeouts
+ *		temps->sensors[0].req_interval = DS18B20_9_BIT_TIME;
+ *		temps->sensors[1].req_interval = DS18B20_9_BIT_TIME;
+ *		temps->sensors[2].req_interval = DS18B20_9_BIT_TIME;
+ *		temps->sensors[3].req_interval = DS18B20_12_BIT_TIME;
+ *		temps->sensors[4].req_interval = DS18B20_12_BIT_TIME;
+ *
+ *		// enable
+ *		temps->sensors[0].is_enable = true;
+ *		temps->sensors[1].is_enable = true;
+ *		temps->sensors[2].is_enable = true;
+ *		temps->sensors[3].is_enable = true;
+ *		temps->sensors[4].is_enable = true;
+ *
+ *		// check
+ *		for (int i = 0; i < temps->sensors_count; i++) {
+ *			int ret = temps_lib_init(&temps->sensors[i]);
+ *			if (ret)
+ *				;	// do something
+ *		}
+ *
+ *		// set the async mode
  *		warn_sensors.setWaitForConversion(false);
  *		def_sensors.setWaitForConversion(false);
  *	}
  *
  *	Next you can computing cur_temp, tar_temp, prev_temp, changes_timer in bg function,
  *	in interrupts, in callback... as you want, here without this
- *
- *	NOTE:
- *		begin() func of DallasTemperature obj IS NOT called ANYWHERE here.
- *		setWaitForConversion() func of DallasTemperature obj IS NOT called ANYWHERE here.
- *		You need to call it yourself for your objects
- *
- *		TODO: add general init func to do it
  */
 
 #ifndef TEMPS_USE_DS18B20
 #define TEMPS_USE_DS18B20
 #endif
 
-/*
- * Register new OneWire, DallasTemperature objects to management sensors
- * Call once for each temperature pin
- *
- * @name - name for new DallasTemperature object
- * @pin - pin on which the sensor/sensors are located
+/**
+ * Alias to float, one digit after the decimal point
+ * 255 mean 25.5, 777 mean 77.7, 1115 -> 111.5
+ * maximum is 6553.6
  */
-#define TEMPS_REGISTER_SENSORS_PIN(name, pin)			\
-	static OneWire name ##_wire((pin));			\
-	static DallasTemperature name(&(name ## _wire))
-
-/*
- * Register new array of 'struct temp_sensors'
- * Call once for all of your sensors
- *
- * @name - name for new array
- * @count - count of items in array
- */
-#define TEMPS_REGISTER_ARR(name, count)				\
-	static struct temp_sensor (name)[(count)]
-
-/*
- * Set all fields of sensor to 0/NULL
- */
-#define TEMPS_SET_SENSOR_TO_ZERO(sensor)			\
-	do {							\
-		(sensor).obj = NULL;				\
-		/*(sensor).address = 0;		*/		\
-		(sensor).resolution = simple;  /* def simple */	\
-		(sensor).cur_temp = 0;				\
-		(sensor).prev_temp = 0;				\
-		(sensor).tar_temp = 0;				\
-		(sensor).changes_timer = 0;			\
-		(sensor).data = 0;				\
-		(sensor).errors = 0;				\
-		(sensor)._read_timer = 0;			\
-		(sensor).is_enable = 1;	/* default enable */	\
-	} while (0)
-
-
-/* alias to float, 255 mean 25.5, 777 mean 77.7, 1115 mean 111.5, etc, one sign afer dot */
 typedef uint16_t fl_t;
 
 
 #ifdef TEMPS_USE_DS18B20
-enum accuracy {
-			/* resolution	time */
-	simple = 9,	/* 0.5 C	93.75 ms*/
-	standard = 10,	/* 0.25 C	187.5 ms*/
-	advanced = 11,	/* 0.125 C	350 ms */
-	special = 12	/* 0.0625 C	750 ms */
+#include <OneWire.h>
+#include <DallasTemperature.h>
+
+#define DS18B20_MAX_TEMP 125
+#define DS18B20_MIN_TEMP -55
+
+#define DS18B20_9_BIT_TIME 95
+#define DS18B20_10_BIT_TIME 190
+#define DS18B20_11_BIT_TIME 350
+#define DS18B20_12_BIT_TIME 750
+
+/**
+ * Register new OneWire, DallasTemperature objects to management DS18B20 sensors
+ * Call once for each pin
+ *
+ * @name - name for new DallasTemperature object
+ * @pin - pin on which the sensor/sensors are located
+ */
+#define TEMPS_REGISTER_DS18B20_PIN(name, pin)			\
+	static OneWire name ##_wire((pin));			\
+	static DallasTemperature name(&(name ## _wire))
+
+
+struct ds18b20 {
+	DallasTemperature *obj;
+	DeviceAddress address;
 };
 
-enum {
-	device_not_found_lib_ec = 60,
-	struct_not_found_lib_ec = 61,
-	dt_obj_not_found_lib_ec = 62,	/* DallasTemperature */
-};
-#endif
+fl_t read_ds18b20(struct temp_sensor *sensor);
+void request_ds18b20(struct temp_sensor *senfor);
+
+#endif /* TEMPS_USE_DS18B20 */
+
+
+#define TEMPS_SENSOR_DATA_INVALID 22
+#define TEMPS_READ_TEMP_INVALID 23
+#define TEMPS_REQUEST_TEMP_INVALID 24
 
 
 struct temp_sensor {
-	DallasTemperature *obj;
-	DeviceAddress address;
+	/**
+	 * sensor-specific data;
+	 * store here everything you need for read_temp() and request_temp() funtions
+	 */
+	void *sensor_data;
 
-	enum accuracy resolution;
 	fl_t cur_temp;
 	fl_t prev_temp;
 	fl_t tar_temp;
 	uint32_t changes_timer;		/* millis(), when value was entered into 'prev_temp' */
 	uint32_t data;			/* user data about this sensor */
-	uint8_t cur_temp_str[5];	/* buff to str representation of cur_temp */
+	uint32_t req_interval;		/* request temp no more often than every req_interval ms */
 	uint8_t errors;
-	uint8_t is_enable;		/* 0 - disable, 1 - enable */
+	bool is_enable;
 	uint32_t _read_timer;
+
+	/**
+	 * In these functions, you don't need to change the fields in the 'struct temp_sensor',
+	 * the library does it all for you. You just need to return the correct temperature
+	 * and request a new value.
+	 * The library calls them in temps_lib_refresh(), so make them as fast as possible.
+	 * And of cource, it's in your best interest for them to be 'asynchronous'.
+	 */
+	fl_t (*read_temp)(struct temp_sensor *sensor); /* func to read finished temp */
+	void (*request_temp)(struct temp_sensor *sensor); /* func to request new temp */
 };
 
 struct temps_service {
@@ -187,11 +225,7 @@ struct temps_service {
 };
 
 
-uint8_t temps_lib_init_sensor(struct temp_sensor *sensor,
-			      DallasTemperature *obj,
-			      enum accuracy res,
-			      uint8_t index,
-			      uint8_t devices_count);
+uint8_t temps_lib_init(struct temp_sensor *sensor);
 uint8_t temps_lib_refresh(struct temps_service *service);
 uint8_t *temps_lib_convert(fl_t num, uint8_t buff[5], uint8_t is_float);
 

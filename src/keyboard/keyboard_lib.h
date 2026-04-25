@@ -106,23 +106,27 @@
 
 
 /*
- * Register new 'struct encoder' static variable to encoder control
+ * Register new object to encoder control
+ * Call this macro from your setup() function. Different encoders require
+ * different @name arguments.
  *
- * @name - name for new 'struct encoder' obj
+ * @name - just a unique string
  * @left - pin number, where left turn is connected
  * @right - pin number, where right turn is connected
  * @key - pin number, where key (aka button) is connected
+ * @data - field of 'struct encoder' type; the values of fields of this struct
+ *		will be changed
  */
-#define KEYBOARDS_REGISTER_ENCODER(name, left, right, key)		\
-	static EncButton (_enc_ ## name)((left), (right), (key));	\
-	static struct encoder (name) = {				\
-		.left_turn = NULL,					\
-		.left_pressed_turn = NULL,				\
-		.right_turn = NULL,					\
-		.right_pressed_turn = NULL,				\
-		.click = NULL,						\
-		.obj = &(_enc_ ## name)					\
-	}
+#define KEYBOARDS_REGISTER_ENCODER(name, left, right, key, data)		\
+	do {									\
+		static EncButton (_enc_ ## name)((left), (right), (key));	\
+		(data).left_turn = NULL;					\
+		(data).left_pressed_turn = NULL;				\
+		(data).right_turn = NULL;					\
+		(data).right_pressed_turn = NULL;				\
+		(data).click = NULL;						\
+		(data).obj = &(_enc_ ## name);					\
+	} while (0)
 
 
 typedef void *(*action_func)(void *arg);

@@ -172,7 +172,7 @@ struct keyboard_service {
 
 uint8_t keyboards_lib_init(struct keyboard_service *service);
 
-/* return 1 if one of bts clicked, else 0 */
+/* return 0 if all objects processed, else not 0 */
 uint8_t keyboards_lib_refresh(struct keyboard_service *keyboard);
 
 

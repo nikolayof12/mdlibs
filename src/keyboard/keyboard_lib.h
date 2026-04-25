@@ -30,26 +30,24 @@
  *	For example, we have 1 encoder (D3, D4, D5 pins) and 3 buttons (D7, D8, D9 pins)
  *
  *
- * KEYBOARDS_REGISTER_ENCODER(enc_menu, 3, 4, 5);
- * struct encoder my_encoders[1];
+ * // create global variables
+ * static struct encoder my_encoders[1];
+ * static struct button my_buttons[3];
  *
- * KEYBOARDS_REGISTER_BUTTON(accept, 7);
- * KEYBOARDS_REGISTER_BUTTON(cancel, 8);
- * KEYBOARDS_REGISTER_BUTTON(back, 9);
- * struct button my_buttons[3];
- *
- * struct keyboard_service my_keyboard;
+ * static struct keyboard_service my_keyboard;
  *
  * uint8_t some_init_func(void)
  * {
+ *	KEYBOARDS_REGISTER_BUTTON(accept, 7, my_buttons[0]);
+ *	KEYBOARDS_REGISTER_BUTTON(cancel, 8, my_buttons[1]);
+ *	KEYBOARDS_REGISTER_BUTTON(back, 9, my_buttons[2]);
+ *
+ *	KEYBOARDS_REGISTER_ENCODER(enc_menu, 3, 4, 5, my_encoders[0]);
+ *
  *	// collect all keyboard elements into one main structure:
  *	my_keyboard.buttons = my_buttons;
- *	my_keyboard.buttons[0] = accept;
- *	my_keyboard.buttons[1] = cancel;
- *	my_keyboard.buttons[2] = back;
  *	my_keyboard.buttons_count = 3;
  *	my_keyboard.encoders = my_encoders;
- *	my_keyboard.encoders[0] = enc_menu;
  *	my_keyboard.encoders_count = 1;
  *
  *

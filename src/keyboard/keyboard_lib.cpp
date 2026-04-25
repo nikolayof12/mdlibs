@@ -21,8 +21,6 @@ uint8_t _refresh_encoder(struct encoder *enc)
 
 		action = enc->right_turn;
 		action->func(action->data);
-
-		return 0;
 	}
 
 	if (enc->obj->rightH()) {
@@ -31,8 +29,6 @@ uint8_t _refresh_encoder(struct encoder *enc)
 
 		action = enc->right_pressed_turn;
 		action->func(action->data);
-
-		return 0;
 	}
 
 	if (enc->obj->left()) {
@@ -41,8 +37,6 @@ uint8_t _refresh_encoder(struct encoder *enc)
 
 		action = enc->left_turn;
 		action->func(action->data);
-
-		return 0;
 	}
 
 	if (enc->obj->leftH()) {
@@ -51,8 +45,6 @@ uint8_t _refresh_encoder(struct encoder *enc)
 
 		action = enc->left_pressed_turn;
 		action->func(action->data);
-
-		return 0;
 	}
 
 	if (enc->obj->click()) {
@@ -61,8 +53,6 @@ uint8_t _refresh_encoder(struct encoder *enc)
 
 		action = enc->click;
 		action->func(action->data);
-
-		return 0;
 	}
 
 
@@ -82,7 +72,6 @@ uint8_t _refresh_button(struct button *btn)
 
 		action = btn->click;
 		action->func(action->data);
-		return 0;
 	}
 
 	if (btn->obj->hold()) {
@@ -91,7 +80,6 @@ uint8_t _refresh_button(struct button *btn)
 
 		action = btn->long_click;
 		action->func(action->data);
-		return 0;
 	}
 
 	return 0;
